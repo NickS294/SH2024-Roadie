@@ -1,0 +1,76 @@
+# Project Name
+
+## 🚀 About the Project
+
+Description of project is and what it achieves. the problem, solution, the impact of your solution, and how it works at high level
+
+Example:
+> **Project Name** is a ... 
+## 🛠️ Features
+
+- feat 1
+- ...
+- feat n
+
+
+## 🚨 Problem Statement
+
+Problem, how its solved, and why address it
+
+## 💡 Inspiration
+related works/ experiences that inspired
+
+## 🧠 How We Built It
+
+Describe the tools, technologies, and platforms used to build your project
+
+## ⚙️ Installation & Usage
+
+Steps to run the project locally
+
+### Prerequisites
+
+List any required dependencies or software:
+
+```bash
+# Example for Node.js projects
+npm install
+```
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/username/repository.git
+   ```
+2. Navigate to the project directory:
+   ```bash
+   cd project-name
+   ```
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
+4. Start the development server:
+   ```bash
+   npm start
+   ```
+
+## 🧑‍🤝‍🧑 Team Members
+
+- **Name** – Frontend Developer
+- **Name** – Backend Developer
+- **Name** – AI/ML Specialist
+
+## 🎯 Next Steps
+
+List any future enhancements or goals
+
+
+## 📑 License
+
+MIT License
+
+## 🙌 Acknowledgements
+
+- hackathon organizers and sponsors
