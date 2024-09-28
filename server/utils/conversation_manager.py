@@ -2,6 +2,7 @@ import time
 from .config import transcription_queue, speech_queue, is_speaking, profile_info
 from .profile_manager import update_profile_info, create_user_profile, get_next_profile_question
 from .gpt_interface import get_gpt_response
+from .shared import ai_is_speaking
 
 def manage_conversation():
     greeting_sent = False
@@ -10,11 +11,11 @@ def manage_conversation():
     last_user_speech_time = None
     last_ai_response_time = time.time()
     
-    ai_response_delay = 4
+    ai_response_delay = 2
     silence_prompt_interval = 30
     max_silence_prompts = 3
     extended_silence_threshold = 120
-    initial_silence_threshold = 10
+    initial_silence_threshold = 8
     
     silence_prompt_count = 0
     waiting_to_respond = False
@@ -24,6 +25,8 @@ def manage_conversation():
         speech_queue.put(text)
         last_ai_response_time = time.time()
         conversation_history.append({"role": "assistant", "content": text})
+        time.sleep(len(text) * 0.1)
+        ai_is_speaking.clear()  
     
     while True:
         current_time = time.time()
@@ -43,13 +46,18 @@ def manage_conversation():
             silence_prompt_count = 0
             user_spoke = True
             waiting_to_respond = True
+
+            if profile_created:
+                return profile
             
             if update_profile_info(user_input):
+                print("Updated profile info:", {k: v for k, v in profile_info.items() if v is not None})
                 if all(profile_info.values()) and not profile_created:
                     profile = create_user_profile()
-                    ai_speak(f"Thank you for sharing. Based on what you've told me, here's a summary of your profile: {profile}")
+                    ai_speak(f"Thank you for sharing. Based on what you've told me, here's a summary of your profile:\n")
                     profile_created = True
                     waiting_to_respond = False
+                    return profile
         
         if user_spoke:
             time.sleep(ai_response_delay)

@@ -7,7 +7,9 @@ def main():
     
     threading.Thread(target=listen_and_transcribe, daemon=True).start()
     threading.Thread(target=speech_worker, daemon=True).start()
-    threading.Thread(target=manage_conversation, daemon=True).start()
+
+    profile = manage_conversation() 
+
     
     try:
         while True:

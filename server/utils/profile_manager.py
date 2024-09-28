@@ -39,7 +39,7 @@ def update_profile_info(user_input):
                         "value": {"type": "string"},
                         "meets_criteria": {"type": "boolean"}
                     },
-                    "description": "A recent challenge the user has faced"
+                    "description": "A challenge the user has faced"
                 }
             }
         }

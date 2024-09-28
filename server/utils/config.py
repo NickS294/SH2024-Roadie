@@ -16,7 +16,7 @@ elevenlabs_client = ElevenLabs(api_key=os.environ['ELEVENLABS_API_KEY'])
 whisper_model = whisper.load_model("medium")
 
 recognizer = sr.Recognizer()
-recognizer.energy_threshold = 1500
+recognizer.energy_threshold = 1800
 recognizer.dynamic_energy_threshold = True
 
 pygame.mixer.init()

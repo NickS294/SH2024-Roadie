@@ -3,7 +3,9 @@ import numpy as np
 import pygame
 import io
 from elevenlabs import VoiceSettings
+import time
 from .config import recognizer, whisper_model, elevenlabs_client, transcription_queue, speech_queue, is_speaking
+from .shared import ai_is_speaking
 
 def listen_and_transcribe():
     with sr.Microphone(sample_rate=16000) as source:
@@ -11,6 +13,9 @@ def listen_and_transcribe():
         print("Listening...")
         
         while True:
+            if ai_is_speaking.is_set():
+                time.sleep(0.1)
+                continue
             try:
                 audio = recognizer.listen(source, timeout=5, phrase_time_limit=10)
                 np_audio = np.frombuffer(audio.get_raw_data(), dtype=np.int16)
