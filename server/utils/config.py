@@ -7,10 +7,12 @@ from elevenlabs import ElevenLabs
 import queue
 import threading
 import pygame
+import anthropic
 
 load_dotenv()
 
 client = openai.OpenAI(api_key=os.environ['OPENAI_API_KEY'])
+anthropic_client = anthropic.Anthropic()
 elevenlabs_client = ElevenLabs(api_key=os.environ['ELEVENLABS_API_KEY'])
 
 whisper_model = whisper.load_model("medium")
@@ -24,6 +26,6 @@ pygame.mixer.init()
 transcription_queue = queue.Queue()
 speech_queue = queue.Queue()
 
-profile_info = {q: None for q in ["name", "goals", "interests", "recent_challenge"]}
+profile_info = {q: None for q in ["name", "goals", "interests", "challenge"]}
 
 is_speaking = threading.Event()

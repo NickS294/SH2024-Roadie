@@ -9,8 +9,9 @@ def main():
     threading.Thread(target=speech_worker, daemon=True).start()
 
     profile = manage_conversation() 
+    flowchart= generate_flowchart(profile)
+    print(flowchart)
 
-    
     try:
         while True:
             time.sleep(1)

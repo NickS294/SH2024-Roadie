@@ -11,11 +11,11 @@ def manage_conversation():
     last_user_speech_time = None
     last_ai_response_time = time.time()
     
-    ai_response_delay = 2
+    ai_response_delay = 4
     silence_prompt_interval = 30
     max_silence_prompts = 3
     extended_silence_threshold = 120
-    initial_silence_threshold = 8
+    initial_silence_threshold = 10
     
     silence_prompt_count = 0
     waiting_to_respond = False
@@ -49,7 +49,7 @@ def manage_conversation():
 
             if profile_created:
                 return profile
-            
+
             if update_profile_info(user_input):
                 print("Updated profile info:", {k: v for k, v in profile_info.items() if v is not None})
                 if all(profile_info.values()) and not profile_created:

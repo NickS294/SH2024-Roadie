@@ -33,13 +33,13 @@ def update_profile_info(user_input):
                     },
                     "description": "The user's main interests or hobbies"
                 },
-                "recent_challenge": {
+                "challenge": {
                     "type": "object",
                     "properties": {
                         "value": {"type": "string"},
                         "meets_criteria": {"type": "boolean"}
                     },
-                    "description": "A challenge the user has faced"
+                    "description": "A simple challenge the user has faced."
                 }
             }
         }
