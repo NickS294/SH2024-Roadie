@@ -10,35 +10,94 @@
 <body>
     <div class="container">
         <h1>Web Development Roadmap</h1>
-        <div class="mermaid">
-            graph TD
-            A[Web Development] --> B[Frontend]
-            A --> C[Backend]
-            A --> D[DevOps]
-
-            B --> E[HTML]
-            B --> F[CSS]
-            B --> G[JavaScript]
-            G --> H[Frameworks]
-
-            C --> I[Server-side Languages]
-            C --> J[Databases]
-            C --> K[APIs]
-
-            D --> L[Version Control]
-            D --> M[Deployment]
-            D --> N[CI/CD]
-
-            click E "https://example.com/html" _blank
-            click F "https://example.com/css" _blank
-            click G "https://example.com/javascript" _blank
-            click H "https://example.com/js-frameworks" _blank
-            click I "https://example.com/server-side-languages" _blank
-            click J "https://example.com/databases" _blank
-            click K "https://example.com/apis" _blank
-            click L "https://example.com/version-control" _blank
-            click M "https://example.com/deployment" _blank
-            click N "https://example.com/ci-cd" _blank
+        
+        <!-- Draggable roadmap container -->
+        <div class="roadmap-container">
+            <div class="mermaid">
+                graph TD
+                A[Web Development] --> B[Frontend]
+                A --> C[Backend]
+                A --> D[DevOps]
+            
+                B --> E[HTML]
+                B --> F[CSS]
+                B --> G[JavaScript]
+                G --> H[Frameworks]
+                G --> I[DOM Manipulation]
+                G --> J[APIs]
+            
+                C --> K[Server-side Languages]
+                K --> L[Node.js]
+                K --> M[Python]
+                K --> N[PHP]
+                K --> O[Ruby]
+            
+                C --> P[Databases]
+                P --> Q[SQL]
+                P --> R[NoSQL]
+                R --> S[MongoDB]
+                R --> T[Cassandra]
+            
+                C --> U[APIs]
+                U --> V[REST]
+                U --> W[GraphQL]
+            
+                D --> X[Version Control]
+                X --> Y[Git]
+                Y --> Z[GitHub]
+            
+                D --> AA[Deployment]
+                AA --> AB[Cloud Services]
+                AB --> AC[AWS]
+                AB --> AD[Azure]
+                AB --> AE[Google Cloud]
+            
+                D --> AF[CI/CD]
+                AF --> AG[Continuous Integration]
+                AF --> AH[Continuous Deployment]
+            
+                D --> AI[Monitoring]
+                AI --> AJ[Logging]
+                AI --> AK[Alerting]
+            
+                click A "https://example.com/web-development" _blank
+                click B "https://example.com/frontend" _blank
+                click C "https://example.com/backend" _blank
+                click D "https://example.com/devops" _blank
+                click E "https://example.com/html" _blank
+                click F "https://example.com/css" _blank
+                click G "https://example.com/javascript" _blank
+                click H "https://example.com/js-frameworks" _blank
+                click I "https://example.com/dom-manipulation" _blank
+                click J "https://example.com/apis" _blank
+                click K "https://example.com/server-side-languages" _blank
+                click L "https://example.com/nodejs" _blank
+                click M "https://example.com/python" _blank
+                click N "https://example.com/php" _blank
+                click O "https://example.com/ruby" _blank
+                click P "https://example.com/databases" _blank
+                click Q "https://example.com/sql" _blank
+                click R "https://example.com/nosql" _blank
+                click S "https://example.com/mongodb" _blank
+                click T "https://example.com/cassandra" _blank
+                click U "https://example.com/apis" _blank
+                click V "https://example.com/rest" _blank
+                click W "https://example.com/graphql" _blank
+                click X "https://example.com/version-control" _blank
+                click Y "https://example.com/git" _blank
+                click Z "https://example.com/github" _blank
+                click AA "https://example.com/deployment" _blank
+                click AB "https://example.com/cloud-services" _blank
+                click AC "https://example.com/aws" _blank
+                click AD "https://example.com/azure" _blank
+                click AE "https://example.com/google-cloud" _blank
+                click AF "https://example.com/ci-cd" _blank
+                click AG "https://example.com/continuous-integration" _blank
+                click AH "https://example.com/continuous-deployment" _blank
+                click AI "https://example.com/monitoring" _blank
+                click AJ "https://example.com/logging" _blank
+                click AK "https://example.com/alerting" _blank
+            </div>
         </div>
     </div>
     <script src="script.js"></script>
