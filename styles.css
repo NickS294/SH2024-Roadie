@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=San+Francisco:wght@400;600&display=swap');
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f5f5f7;
+    color: #1d1d1f;
+}
+
+.container {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 40px;
+    border-radius: 18px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(20px);
+    max-width: 90%;
+    max-height: 90%;
+    overflow: auto;
+}
+
+h1 {
+    font-weight: 600;
+    font-size: 32px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.mermaid {
+    font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* Mermaid Overrides */
+.node rect,
+.node circle,
+.node ellipse,
+.node polygon {
+    fill: #ffffff;
+    stroke: #a1a1a6;
+    stroke-width: 1px;
+}
+
+.edgePath .path {
+    stroke: #a1a1a6;
+    stroke-width: 1px;
+}
+
+.arrowheadPath {
+    fill: #a1a1a6;
+}
+
+.nodeLabel {
+    color: #1d1d1f;
+    font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
