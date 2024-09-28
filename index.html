@@ -54,29 +54,12 @@
         let scale = 1;
         let minScale = 1;
 
+        //the grpah is waiting to be defined write to it with a py file to replace
+        //the A[loading...] with the output graph
         const diagramDefinition = `
-       graph TD
-            A[Journey to Becoming a Doctor] --> B[Develop Interest in Medicine]
-            B --> C[Explore Neuroscience]
-            C --> D{Is Neuroscience Right?}
-            D -->|Yes| E[Deepen Neuroscience Knowledge]
-            D -->|No| F[Explore Other Fields]
-            E --> G[Gain Experience]
-            F --> G
-            G --> H{Sufficient Experience?}
-            H -->|Yes| I[Prepare for Medical School]
-            I --> J[Prerequisite Courses]
-            J --> K[Study for MCAT]
-            K --> L{MCAT Score Satisfactory?}
-            L -->|Yes| N[Apply to Schools]
-            L -->|No| M[Retake MCAT]
-            N --> O{Accepted?}
-            O -->|Yes| Q[Begin Medical School]
-            O -->|No| P[Improve Application]
-            Q --> R[Complete Pre-Clinical Years]
-            R --> S[Clinical Rotations]
-            S --> T{Choose Specialty?}
-                `;
+            graph TD
+                A[loading...]    
+                            `;
 
         mermaid.mermaidAPI.render('mermaid-diagram', diagramDefinition, (svgCode) => {
             diagram.innerHTML = svgCode;
