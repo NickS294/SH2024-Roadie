@@ -4,7 +4,7 @@ client = anthropic.Anthropic()
 
 PROMPT = (
     "Create a flowchart/roadmap of vast depth using Mermaid syntax that best suits the following profile. "
-    "Make sure to include multi-step reasoning, feedback loops, subgraphs, and logic nodes if necessary. "
+    "Make sure to include multi-step reasoning, feedback loops,and logic nodes if necessary. "
     "Output only the Mermaid code, without any explanations or additional text. "
     "Here is the profile: {profile}"
 )
@@ -16,7 +16,7 @@ def generate_flowchart(profile):
     try:
         message = client.messages.create(
             model="claude-3-5-sonnet-20240620",
-            max_tokens=1000,
+            max_tokens=2000,
             temperature=0,
             system="You are a world-class AI that generates Mermaid syntax for flowcharts.",
             messages=[
