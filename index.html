@@ -3,103 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Development Roadmap</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <title>Interactive Mermaid Diagram</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/9.3.0/mermaid.min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        #diagram-container {
+            width: 100%;
+            height: 100%;
+            background-color: #f0f0f0;
+            position: relative;
+            overflow: hidden;
+        }
+        #diagram {
+            position: absolute;
+            transform-origin: 0 0;
+        }
+        #header {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 5px 10px;
+            border-radius: 5px;
+            z-index: 1000;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Web Development Roadmap</h1>
-        
-        <!-- Draggable roadmap container -->
-        <div class="roadmap-container">
-            <div class="mermaid">
-                graph TD
-                A[Web Development] --> B[Frontend]
-                A --> C[Backend]
-                A --> D[DevOps]
-            
-                B --> E[HTML]
-                B --> F[CSS]
-                B --> G[JavaScript]
-                G --> H[Frameworks]
-                G --> I[DOM Manipulation]
-                G --> J[APIs]
-            
-                C --> K[Server-side Languages]
-                K --> L[Node.js]
-                K --> M[Python]
-                K --> N[PHP]
-                K --> O[Ruby]
-            
-                C --> P[Databases]
-                P --> Q[SQL]
-                P --> R[NoSQL]
-                R --> S[MongoDB]
-                R --> T[Cassandra]
-            
-                C --> U[APIs]
-                U --> V[REST]
-                U --> W[GraphQL]
-            
-                D --> X[Version Control]
-                X --> Y[Git]
-                Y --> Z[GitHub]
-            
-                D --> AA[Deployment]
-                AA --> AB[Cloud Services]
-                AB --> AC[AWS]
-                AB --> AD[Azure]
-                AB --> AE[Google Cloud]
-            
-                D --> AF[CI/CD]
-                AF --> AG[Continuous Integration]
-                AF --> AH[Continuous Deployment]
-            
-                D --> AI[Monitoring]
-                AI --> AJ[Logging]
-                AI --> AK[Alerting]
-            
-                click A "https://example.com/web-development" _blank
-                click B "https://example.com/frontend" _blank
-                click C "https://example.com/backend" _blank
-                click D "https://example.com/devops" _blank
-                click E "https://example.com/html" _blank
-                click F "https://example.com/css" _blank
-                click G "https://example.com/javascript" _blank
-                click H "https://example.com/js-frameworks" _blank
-                click I "https://example.com/dom-manipulation" _blank
-                click J "https://example.com/apis" _blank
-                click K "https://example.com/server-side-languages" _blank
-                click L "https://example.com/nodejs" _blank
-                click M "https://example.com/python" _blank
-                click N "https://example.com/php" _blank
-                click O "https://example.com/ruby" _blank
-                click P "https://example.com/databases" _blank
-                click Q "https://example.com/sql" _blank
-                click R "https://example.com/nosql" _blank
-                click S "https://example.com/mongodb" _blank
-                click T "https://example.com/cassandra" _blank
-                click U "https://example.com/apis" _blank
-                click V "https://example.com/rest" _blank
-                click W "https://example.com/graphql" _blank
-                click X "https://example.com/version-control" _blank
-                click Y "https://example.com/git" _blank
-                click Z "https://example.com/github" _blank
-                click AA "https://example.com/deployment" _blank
-                click AB "https://example.com/cloud-services" _blank
-                click AC "https://example.com/aws" _blank
-                click AD "https://example.com/azure" _blank
-                click AE "https://example.com/google-cloud" _blank
-                click AF "https://example.com/ci-cd" _blank
-                click AG "https://example.com/continuous-integration" _blank
-                click AH "https://example.com/continuous-deployment" _blank
-                click AI "https://example.com/monitoring" _blank
-                click AJ "https://example.com/logging" _blank
-                click AK "https://example.com/alerting" _blank
-            </div>
-        </div>
+    <div id="header">Diagram</div>
+    <div id="diagram-container">
+        <div id="diagram"></div>
     </div>
-    <script src="script.js"></script>
+
+    <script>
+        mermaid.initialize({ startOnLoad: false });
+
+        const diagramContainer = document.getElementById('diagram-container');
+        const diagram = document.getElementById('diagram');
+        let isDragging = false;
+        let startX, startY, diagramX = 0, diagramY = 0;
+        let scale = 1;
+
+        const diagramDefinition = `
+        graph TD
+            A[Abiel's Journey to Becoming a Doctor] --> B[Develop Interest in Medicine]
+            B --> C[Explore Neuroscience]
+            C --> D{Is Neuroscience Right?}
+            D -->|Yes| E[Deepen Neuroscience Knowledge]
+            D -->|No| F[Explore Other Fields]
+            E --> G[Gain Experience]
+            F --> G
+            G --> H{Sufficient Experience?}
+            H -->|Yes| I[Prepare for Medical School]
+            I --> J[Prerequisite Courses]
+            J --> K[Study for MCAT]
+            K --> L{MCAT Score Satisfactory?}
+            L -->|Yes| N[Apply to Schools]
+            L -->|No| M[Retake MCAT]
+            N --> O{Accepted?}
+            O -->|Yes| Q[Begin Medical School]
+            O -->|No| P[Improve Application]
+            Q --> R[Complete Pre-Clinical Years]
+            R --> S[Clinical Rotations]
+            S --> T{Choose Specialty?}
+            T -->|Neurology| U[Focus on Neurology]
+            T -->|Other| V[Explore Other Specialties]
+            U --> W[Complete Residency]
+            V --> W
+            W --> X[Obtain License]
+            X --> Y[Start Practice]
+            Y --> Z{Continuous Learning}
+            Z --> AA[Attend Conferences]
+            Z --> AB[Pursue Research]
+            Z --> AC[Mentor Students]
+            AA --> Z
+            AB --> Z
+            AC --> Z
+            Z --> AD[Impact Patients' Lives]
+            AD --> AE{Career Satisfaction?}
+            AE -->|Yes| AF[Continue Path]
+            AE -->|No| AG[Reassess Goals]
+        `;
+
+        mermaid.mermaidAPI.render('mermaid-diagram', diagramDefinition, (svgCode) => {
+            diagram.innerHTML = svgCode;
+            const svgElement = diagram.querySelector('svg');
+            svgElement.style.width = '100%';
+            svgElement.style.height = '100%';
+            
+            // Fit diagram to optimal view
+            fitDiagramToOptimalView();
+        });
+
+        function fitDiagramToOptimalView() {
+            const svgElement = diagram.querySelector('svg');
+            if (svgElement) {
+                const containerWidth = diagramContainer.clientWidth;
+                const containerHeight = diagramContainer.clientHeight;
+                const diagramWidth = svgElement.getBoundingClientRect().width;
+                const diagramHeight = svgElement.getBoundingClientRect().height;
+
+                // Calculate scale to fit width with some padding
+                const widthScale = (containerWidth * 0.9) / diagramWidth;
+                
+                // Calculate scale to fit height with some padding
+                const heightScale = (containerHeight * 0.9) / diagramHeight;
+
+                // Use the smaller scale to ensure the entire diagram fits
+                scale = Math.min(widthScale, heightScale);
+
+                // Further reduce the scale to zoom out a bit more
+                scale *= 0.8;
+
+                // Center the diagram
+                diagramX = (containerWidth - diagramWidth * scale) / 2;
+                diagramY = (containerHeight - diagramHeight * scale) / 2;
+
+                updateTransform();
+            }
+        }
+
+        function handleWheel(e) {
+            e.preventDefault();
+            const delta = e.deltaY * -0.0035;
+            const newScale = Math.max(0.1, scale + delta); // Remove the upper limit
+
+            
+            // Adjust position to zoom towards cursor
+            const rect = diagramContainer.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            diagramX = x - (x - diagramX) * newScale / scale;
+            diagramY = y - (y - diagramY) * newScale / scale;
+            
+            scale = newScale;
+            updateTransform();
+        }
+
+        function handleMouseDown(e) {
+            isDragging = true;
+            startX = e.clientX - diagramX;
+            startY = e.clientY - diagramY;
+        }
+
+        function handleMouseMove(e) {
+            if (!isDragging) return;
+            diagramX = (e.clientX - startX);
+            diagramY = (e.clientY - startY);
+            updateTransform();
+        }
+
+        function handleMouseUp() {
+            isDragging = false;
+        }
+
+        function updateTransform() {
+            diagram.style.transform = `translate(${diagramX}px, ${diagramY}px) scale(${scale})`;
+        }
+
+        diagramContainer.addEventListener('wheel', handleWheel);
+        diagramContainer.addEventListener('mousedown', handleMouseDown);
+        diagramContainer.addEventListener('mousemove', handleMouseMove);
+        diagramContainer.addEventListener('mouseup', handleMouseUp);
+        diagramContainer.addEventListener('mouseleave', handleMouseUp);
+
+        // Refit diagram on window resize
+        window.addEventListener('resize', fitDiagramToOptimalView);
+    </script>
 </body>
 </html>
