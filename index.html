@@ -52,10 +52,11 @@
         let isDragging = false;
         let startX, startY, diagramX = 0, diagramY = 0;
         let scale = 1;
+        let minScale = 1;
 
         const diagramDefinition = `
-        graph TD
-            A[Abiel's Journey to Becoming a Doctor] --> B[Develop Interest in Medicine]
+       graph TD
+            A[Journey to Becoming a Doctor] --> B[Develop Interest in Medicine]
             B --> C[Explore Neuroscience]
             C --> D{Is Neuroscience Right?}
             D -->|Yes| E[Deepen Neuroscience Knowledge]
@@ -75,24 +76,7 @@
             Q --> R[Complete Pre-Clinical Years]
             R --> S[Clinical Rotations]
             S --> T{Choose Specialty?}
-            T -->|Neurology| U[Focus on Neurology]
-            T -->|Other| V[Explore Other Specialties]
-            U --> W[Complete Residency]
-            V --> W
-            W --> X[Obtain License]
-            X --> Y[Start Practice]
-            Y --> Z{Continuous Learning}
-            Z --> AA[Attend Conferences]
-            Z --> AB[Pursue Research]
-            Z --> AC[Mentor Students]
-            AA --> Z
-            AB --> Z
-            AC --> Z
-            Z --> AD[Impact Patients' Lives]
-            AD --> AE{Career Satisfaction?}
-            AE -->|Yes| AF[Continue Path]
-            AE -->|No| AG[Reassess Goals]
-        `;
+                `;
 
         mermaid.mermaidAPI.render('mermaid-diagram', diagramDefinition, (svgCode) => {
             diagram.innerHTML = svgCode;
@@ -112,21 +96,31 @@
                 const diagramWidth = svgElement.getBoundingClientRect().width;
                 const diagramHeight = svgElement.getBoundingClientRect().height;
 
-                // Calculate scale to fit width with some padding
-                const widthScale = (containerWidth * 0.9) / diagramWidth;
-                
-                // Calculate scale to fit height with some padding
-                const heightScale = (containerHeight * 0.9) / diagramHeight;
+                // Convert 0.5 inch to pixels (assuming 96 DPI)
+                const padding = 0.5 * 96;
+                // Convert 2 inches to pixels
+                const maxZoomOutSize = 7.5 * 96;
 
-                // Use the smaller scale to ensure the entire diagram fits
-                scale = Math.min(widthScale, heightScale);
+                // Determine if the diagram is width or height heavy
+                const aspectRatio = diagramWidth / diagramHeight;
+                const containerAspectRatio = containerWidth / containerHeight;
 
-                // Further reduce the scale to zoom out a bit more
-                scale *= 0.8;
+                if (aspectRatio > containerAspectRatio) {
+                    // Width heavy
+                    scale = (containerWidth - 2 * padding) / diagramWidth;
+                    minScale = maxZoomOutSize / diagramWidth;
+                    diagramX = padding;
+                    diagramY = (containerHeight - diagramHeight * scale) / 2;
+                } else {
+                    // Height heavy
+                    scale = (containerHeight - 2 * padding) / diagramHeight;
+                    minScale = maxZoomOutSize / diagramHeight;
+                    diagramX = (containerWidth - diagramWidth * scale) / 2;
+                    diagramY = padding;
+                }
 
-                // Center the diagram
-                diagramX = (containerWidth - diagramWidth * scale) / 2;
-                diagramY = (containerHeight - diagramHeight * scale) / 2;
+                // Ensure we don't zoom out beyond the 2-inch limit
+                scale = Math.max(scale, minScale);
 
                 updateTransform();
             }
@@ -135,9 +129,8 @@
         function handleWheel(e) {
             e.preventDefault();
             const delta = e.deltaY * -0.0035;
-            const newScale = Math.max(0.1, scale + delta); // Remove the upper limit
+            const newScale = Math.max(minScale, Math.min(10, scale + delta)); // Add upper limit of 10x zoom
 
-            
             // Adjust position to zoom towards cursor
             const rect = diagramContainer.getBoundingClientRect();
             const x = e.clientX - rect.left;
