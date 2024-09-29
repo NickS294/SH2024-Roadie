@@ -5,7 +5,6 @@ import uuid
 from flask import Flask, request, jsonify, send_file, render_template
 from flask import render_template_string
 from dotenv import load_dotenv
-import os
 
 load_dotenv()
 ELEVENLABS_API_KEY= os.environ['ELEVENLABS_API_KEY']
@@ -15,9 +14,8 @@ ELEVENLABS_VOICE_STABILITY = 0.5
 ELEVENLABS_VOICE_SIMILARITY = 0.75
 ELEVENLABS_VOICE_NAME = "Bella" 
 
-from utils import update_profile_info, create_user_profile, get_next_profile_question, profile_info, whisper_client, elevenlabs_client, generate_flowchart, narrate_flowchart
+from utils import update_profile_info, create_user_profile, get_next_profile_question, profile_info, whisper_client, elevenlabs_client, generate_flowchart, narrate_flowchart, generate_flowchart_info, STR_TO_REPLACE
 from elevenlabs import VoiceSettings
-ELEVENLABS_ALL_VOICES = []
 
 app = Flask(__name__)
 
@@ -40,10 +38,12 @@ def generate_reply(conversation: list) ->Tuple[str, bool] :
             if flow_chart[0] == '`':
                 flow_chart= flow_chart[:-3]
                 flow_chart= flow_chart[len(str(r"```mermaid"))+1:]
+
+            flow_chart_info= generate_flowchart_info(flow_chart)
             
-            return ("Thank you for sharing. Based on what you've told me, here's a summary of your profile", True, flow_chart)
+            return ("Thank you for sharing. Based on what you've told me, here's a summary of your profile", True, flow_chart, flow_chart_info)
         
-    return (get_next_profile_question(conversation), False, None)
+    return (get_next_profile_question(conversation), False, None, None)
 
 def generate_audio(text: str, output_path: str = "") -> str:
     audio_stream = elevenlabs_client.text_to_speech.convert(
@@ -73,85 +73,20 @@ def roadmap():
         template_content = file.read()
     
     latest_flowchart = get_latest_flowchart()
+    latest_flowchart_data_info= get_latest_flowchart_info()
     
     updated_content = template_content.replace("A[Loading...]", latest_flowchart[len('graph TD'):])
-    '''
-    updated_content = (
-    template_content
-    .replace("A[Loading...]", latest_flowchart[len('graph TD'):])
-    .replace(
-        """{
-    A: {
-      title: "", 
-      content: ""
-    },
-    B: {
-      title: "", 
-      content: ""
-    },
-    C: {
-      title: "", 
-      content: ""
-    },
-    D: {
-      title: "", 
-      content: ""
-    },
-    E: {
-      title: "", 
-      content: ""
-    },
-    F: {
-      title: "", 
-      content: ""
-    },
-    G: {
-      title: "", 
-      content: ""
-    },
-    H: {
-      title: "", 
-      content: ""
-    },
-    I: {
-      title: "", 
-      content: ""
-    },
-    J: {
-      title: "", 
-      content: ""
-    },
-    K: {
-      title: "", 
-      content: ""
-    },
-    L: {
-      title: "", 
-      content: ""
-    },
-    M: {
-      title: "", 
-      content: ""
-    },
-    N: {
-      title: "", 
-      content: ""
-    },
-    O: {
-      title: "", 
-      content: ""
-    }
-  };""", node_info
-    )
-)
-    '''
+    updated_content= updated_content.replace(STR_TO_REPLACE, latest_flowchart_data_info)
     
     return render_template_string(updated_content)
-
 
 def get_latest_flowchart():
     global latest_flowchart_data
     return latest_flowchart_data
+
+def get_latest_flowchart_info():
+    global latest_flowchart_data_info
+    return latest_flowchart_data_info
 
 
 @app.route('/transcribe', methods=['POST'])
@@ -192,7 +127,7 @@ def greeting():
 def ask():
     """Generate a ChatGPT response from the given conversation, then convert it to audio using ElevenLabs."""
     conversation = request.get_json(force=True).get("conversation", "")
-    reply, profile_created, flow_chart = generate_reply(conversation)
+    reply, profile_created, flow_chart, flow_chart_info = generate_reply(conversation)
     reply_file = f"{uuid.uuid4()}.mp3"
     reply_path = f"outputs/{reply_file}"
     os.makedirs(os.path.dirname(reply_path), exist_ok=True)
@@ -201,6 +136,9 @@ def ask():
         
         global latest_flowchart_data
         latest_flowchart_data = flow_chart
+
+        global latest_flowchart_data_info
+        latest_flowchart_data_info= flow_chart_info
         
     return jsonify({'text': reply, 'end': profile_created, 'flowchart_text': flow_chart, 'audio': f"/listen/{reply_file}"}) #see if this messes it up
 

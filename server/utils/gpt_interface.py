@@ -3,9 +3,9 @@ from .config import client
 def get_gpt_response(messages):
     try:
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o",
             messages=messages,
-            max_tokens=512
+            max_tokens=4096
         )
         return response.choices[0].message.content.strip()
     except Exception as e:
