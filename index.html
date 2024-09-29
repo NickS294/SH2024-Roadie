@@ -103,96 +103,74 @@
         let minScale = 1;
 
         const diagramDefinition = `
-            graph TD                        
-                A[Journey to Becoming a Doctor] --> B[Develop Interest in Medicine]
-                B --> C[Explore Neuroscience]
-                C --> D{Is Neuroscience Right?}
-                D -->|Yes| E[Deepen Neuroscience Knowledge]
-                D -->|No| F[Explore Other Fields]
-                E --> G[Gain Experience]
+            graph TD
+            A[Loading...]
+    
+
                 `;
 
                 const nodeInfo = {
     A: {
-        title: "Journey to Becoming a Doctor",
-        content: `
-
-This path requires **dedication**, **compassion**, and **continuous learning**.
-
-## Key Stages:
-- Pre-med education
-- Medical School
-- Residency
-- Licensure
-        `
+      title: "", 
+      content: ""
     },
     B: {
-        title: "Develop Interest in Medicine",
-        content: `
-
-Explore your passion through **shadowing**, **volunteering**, and **reading**.
-
-## Reflect on Your Motivations:
-- Why become a doctor?
-- What areas intrigue you?
-        `
+      title: "", 
+      content: ""
     },
     C: {
-        title: "Explore Neuroscience",
-        content: `
-
-Study the nervous system, focusing on **neuroanatomy** and **cognitive neuroscience**.
-
-## Why Neuroscience?
-- Understanding consciousness
-- Treating neurological disorders
-        `
+      title: "", 
+      content: ""
     },
     D: {
-        title: "Is Neuroscience Right?",
-        content: `
-
-Consider the **research opportunities** and **challenges** involved.
-
-## Self-Reflection Questions:
-- Is the brain fascinating to you?
-- Do you enjoy problem-solving?
-        `
+      title: "", 
+      content: ""
     },
     E: {
-        title: "Deepen Neuroscience Knowledge",
-        content: `
-
-Engage in **advanced coursework** and **research** for deeper insights.
-
-## Steps to Enhance Knowledge:
-- Take relevant courses
-- Attend neuroscience conferences
-        `
+      title: "", 
+      content: ""
     },
     F: {
-        title: "Explore Other Fields",
-        content: `
-
-If neuroscience isn’t for you, consider other specialties like **cardiology** or **pediatrics**.
-
-## How to Explore:
-- Rotate through different departments
-- Attend specialty seminars
-        `
+      title: "", 
+      content: ""
     },
     G: {
-        title: "Gain Experience",
-        content: `
-Practical experience is vital for skill development.
-
-## Ways to Gain Experience:
-- Clinical rotations
-- Research projects
-- Volunteer work
-        `
+      title: "", 
+      content: ""
+    },
+    H: {
+      title: "", 
+      content: ""
+    },
+    I: {
+      title: "", 
+      content: ""
+    },
+    J: {
+      title: "", 
+      content: ""
+    },
+    K: {
+      title: "", 
+      content: ""
+    },
+    L: {
+      title: "", 
+      content: ""
+    },
+    M: {
+      title: "", 
+      content: ""
+    },
+    N: {
+      title: "", 
+      content: ""
+    },
+    O: {
+      title: "", 
+      content: ""
     }
-};
+  };
 
         mermaid.mermaidAPI.render('mermaid-diagram', diagramDefinition, (svgCode) => {
             diagram.innerHTML = svgCode;
