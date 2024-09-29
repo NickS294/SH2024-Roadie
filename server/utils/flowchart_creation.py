@@ -3,9 +3,9 @@ import anthropic
 anthropic_client = anthropic.Anthropic()
 
 PROMPT = (
-    "Create a roadmap using Mermaid js that best suits the following profile be as specific as possible. "
-    "Do not put any nodes past node T."
-    "Output only the Mermaid js code that generates the graph (starting with graph TD and then the body of the roadmap ending with the last node as the final output no quotes or other markers at the end do not include any other text). "
+    "Create a flowchart/roadmap of vast depth using Mermaid syntax that best suits the following profile be as specific as possible. "
+    "Make sure to include multi-step reasoning, feedback loops,and logic nodes if necessary. Do not put any nodes past node T."
+    "Output only the Mermaid code, without any explanations or additional text. "
     "Here is the profile: {profile}"
 )
 
