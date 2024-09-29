@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Mermaid Diagram with Markdown Sidebar</title>
+    <title>Interactive Mermaid Diagram with Markdown Sidebar (Dark Mode)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/9.3.0/mermaid.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.2/marked.min.js"></script>
     <style>
@@ -14,11 +14,13 @@
             height: 100%;
             overflow: hidden;
             font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
         }
         #diagram-container {
             width: 100%;
             height: 100%;
-            background-color: #f0f0f0;
+            background-color: #2a2a2a;
             position: relative;
             overflow: hidden;
         }
@@ -30,12 +32,13 @@
             position: fixed;
             top: 10px;
             left: 10px;
-            background-color: rgba(255, 255, 255, 0.8);
+            background-color: rgba(40, 40, 40, 0.8);
             padding: 5px 10px;
             border-radius: 5px;
             z-index: 1000;
             font-size: 18px;
             font-weight: bold;
+            color: #e0e0e0;
         }
         #sidebar {
             position: fixed;
@@ -43,13 +46,14 @@
             right: -300px;
             width: 300px;
             height: 100%;
-            background-color: white;
-            box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+            background-color: #2a2a2a;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.5);
             transition: right 0.3s ease;
             padding: 20px;
             box-sizing: border-box;
             overflow-y: auto;
             z-index: 1001;
+            color: #e0e0e0;
         }
         #sidebar.open {
             right: 0;
@@ -59,6 +63,7 @@
             top: 10px;
             right: 10px;
             cursor: pointer;
+            color: #e0e0e0;
         }
         #sidebar-content {
             line-height: 1.6;
@@ -66,14 +71,16 @@
         #sidebar-content h1, #sidebar-content h2, #sidebar-content h3 {
             margin-top: 20px;
             margin-bottom: 10px;
+            color: #ffffff;
         }
         #sidebar-content ul, #sidebar-content ol {
             padding-left: 20px;
         }
         #sidebar-content code {
-            background-color: #f0f0f0;
+            background-color: #3a3a3a;
             padding: 2px 4px;
             border-radius: 4px;
+            color: #f0f0f0;
         }
     </style>
 </head>
@@ -89,7 +96,10 @@
     </div>
 
     <script>
-        mermaid.initialize({ startOnLoad: false });
+        mermaid.initialize({ 
+            startOnLoad: false,
+            theme: 'dark'
+        });
 
         const diagramContainer = document.getElementById('diagram-container');
         const diagram = document.getElementById('diagram');
@@ -104,26 +114,7 @@
 
         const diagramDefinition = `
             graph TD
-            
-    A[Start: High School Graduate] --> B[Enroll in Pre-Med Program]
-    B --> C[Complete Core Science Courses]
-    C --> D[Volunteer at Local Hospital]
-    D --> E[Shadow Neurologists]
-    E --> F[Join Neuroscience Club]
-    F --> G[Participate in Neuroscience Seminars]
-    G --> H[Apply for Summer Research Programs]
-    H --> I[Conduct Literature Review on Neuroscience Topics]
-    I --> J[Prepare for MCAT]
-    J --> K[Take MCAT]
-    K --> L[Apply to Medical Schools]
-    L --> M[Interview at Medical Schools]
-    M --> N[Enroll in Medical School]
-    N --> O[Complete First Two Years of Medical School]
-    O --> P[Participate in Neuroscience Research Projects]
-    P --> Q[Complete Clinical Rotations]
-    Q --> R[Apply for Neurology Residency]
-    R --> S[Match with Neurology Residency Program]
-    S --> T[Begin Neurology Residency]
+            A[Loading...]
     
 
                 `;
@@ -190,6 +181,7 @@
       content: ""
     }
   };
+
 
         mermaid.mermaidAPI.render('mermaid-diagram', diagramDefinition, (svgCode) => {
             diagram.innerHTML = svgCode;
