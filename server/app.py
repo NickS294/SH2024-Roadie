@@ -95,7 +95,17 @@ def ask():
     reply_path = f"outputs/{reply_file}"
     os.makedirs(os.path.dirname(reply_path), exist_ok=True)
     generate_audio(reply, output_path=reply_path)
-    return jsonify({'text': reply, 'end': profile_created, 'flowchart_text': flow_chart, 'audio': f"/listen/{reply_file}"})
+    if profile_created:
+        # Construct the path to the index.html file in the current directory
+        html_file_path = "/home/aalmonte/workspace/SH2024-Prep/server/templates/roadmap.html"
+
+        # Read the existing HTML file and replace the placeholders
+        with open(html_file_path, 'r') as file:
+        content = file.read()
+        # Replace the diagram definition placeholder with the actual graph text
+        new_content = content.replace("A[Loading...]",    graph_text[len('graph TD'):])
+
+    return jsonify({'text': reply, 'end': profile_created, 'flowchart_text': flow_chart, 'audio': f"/listen/{reply_file}"}) #see if this messes it up
 
 @app.route('/listen/<filename>')
 def listen(filename):
