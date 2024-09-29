@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Mermaid Diagram</title>
+    <title>Interactive Mermaid Diagram with Markdown Sidebar</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/9.3.0/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.2/marked.min.js"></script>
     <style>
         body, html {
             margin: 0;
@@ -36,12 +37,55 @@
             font-size: 18px;
             font-weight: bold;
         }
+        #sidebar {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background-color: white;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+            transition: right 0.3s ease;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            z-index: 1001;
+        }
+        #sidebar.open {
+            right: 0;
+        }
+        #sidebar-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+        #sidebar-content {
+            line-height: 1.6;
+        }
+        #sidebar-content h1, #sidebar-content h2, #sidebar-content h3 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        #sidebar-content ul, #sidebar-content ol {
+            padding-left: 20px;
+        }
+        #sidebar-content code {
+            background-color: #f0f0f0;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
-    <div id="header">Diagram</div>
+    <div id="header">Your Roadmap</div>
     <div id="diagram-container">
         <div id="diagram"></div>
+    </div>
+    <div id="sidebar">
+        <span id="sidebar-close">&times;</span>
+        <h2 id="sidebar-title"></h2>
+        <div id="sidebar-content"></div>
     </div>
 
     <script>
@@ -49,17 +93,106 @@
 
         const diagramContainer = document.getElementById('diagram-container');
         const diagram = document.getElementById('diagram');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarTitle = document.getElementById('sidebar-title');
+        const sidebarContent = document.getElementById('sidebar-content');
+        const sidebarClose = document.getElementById('sidebar-close');
         let isDragging = false;
         let startX, startY, diagramX = 0, diagramY = 0;
         let scale = 1;
         let minScale = 1;
 
-        //the graph is waiting to be defined write to it with a py file to replace
-        //the loading... part with the output graph
         const diagramDefinition = `
-            graph TD
-                A[loading...]    
-                            `;
+            graph TD                        
+                A[Journey to Becoming a Doctor] --> B[Develop Interest in Medicine]
+                B --> C[Explore Neuroscience]
+                C --> D{Is Neuroscience Right?}
+                D -->|Yes| E[Deepen Neuroscience Knowledge]
+                D -->|No| F[Explore Other Fields]
+                E --> G[Gain Experience]
+                `;
+
+                const nodeInfo = {
+    A: {
+        title: "Journey to Becoming a Doctor",
+        content: `
+
+This path requires **dedication**, **compassion**, and **continuous learning**.
+
+## Key Stages:
+- Pre-med education
+- Medical School
+- Residency
+- Licensure
+        `
+    },
+    B: {
+        title: "Develop Interest in Medicine",
+        content: `
+
+Explore your passion through **shadowing**, **volunteering**, and **reading**.
+
+## Reflect on Your Motivations:
+- Why become a doctor?
+- What areas intrigue you?
+        `
+    },
+    C: {
+        title: "Explore Neuroscience",
+        content: `
+
+Study the nervous system, focusing on **neuroanatomy** and **cognitive neuroscience**.
+
+## Why Neuroscience?
+- Understanding consciousness
+- Treating neurological disorders
+        `
+    },
+    D: {
+        title: "Is Neuroscience Right?",
+        content: `
+
+Consider the **research opportunities** and **challenges** involved.
+
+## Self-Reflection Questions:
+- Is the brain fascinating to you?
+- Do you enjoy problem-solving?
+        `
+    },
+    E: {
+        title: "Deepen Neuroscience Knowledge",
+        content: `
+
+Engage in **advanced coursework** and **research** for deeper insights.
+
+## Steps to Enhance Knowledge:
+- Take relevant courses
+- Attend neuroscience conferences
+        `
+    },
+    F: {
+        title: "Explore Other Fields",
+        content: `
+
+If neuroscience isn’t for you, consider other specialties like **cardiology** or **pediatrics**.
+
+## How to Explore:
+- Rotate through different departments
+- Attend specialty seminars
+        `
+    },
+    G: {
+        title: "Gain Experience",
+        content: `
+Practical experience is vital for skill development.
+
+## Ways to Gain Experience:
+- Clinical rotations
+- Research projects
+- Volunteer work
+        `
+    }
+};
 
         mermaid.mermaidAPI.render('mermaid-diagram', diagramDefinition, (svgCode) => {
             diagram.innerHTML = svgCode;
@@ -67,8 +200,31 @@
             svgElement.style.width = '100%';
             svgElement.style.height = '100%';
             
-            // Fit diagram to optimal view
+            // Add click events to nodes
+            const nodes = svgElement.querySelectorAll('.node');
+            nodes.forEach(node => {
+                node.style.cursor = 'pointer';
+                node.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const nodeId = node.id.split('-')[1];
+                    openSidebar(nodeId);
+                });
+            });
+
             fitDiagramToOptimalView();
+        });
+
+        function openSidebar(nodeId) {
+            const info = nodeInfo[nodeId];
+            if (info) {
+                sidebarTitle.textContent = info.title;
+                sidebarContent.innerHTML = marked.parse(info.content);
+                sidebar.classList.add('open');
+            }
+        }
+
+        sidebarClose.addEventListener('click', () => {
+            sidebar.classList.remove('open');
         });
 
         function fitDiagramToOptimalView() {
@@ -79,30 +235,24 @@
                 const diagramWidth = svgElement.getBoundingClientRect().width;
                 const diagramHeight = svgElement.getBoundingClientRect().height;
 
-                // Convert 0.5 inch to pixels (assuming 96 DPI)
                 const padding = 0.5 * 96;
-                // Convert 2 inches to pixels
                 const maxZoomOutSize = 7.5 * 96;
 
-                // Determine if the diagram is width or height heavy
                 const aspectRatio = diagramWidth / diagramHeight;
                 const containerAspectRatio = containerWidth / containerHeight;
 
                 if (aspectRatio > containerAspectRatio) {
-                    // Width heavy
                     scale = (containerWidth - 2 * padding) / diagramWidth;
                     minScale = maxZoomOutSize / diagramWidth;
                     diagramX = padding;
                     diagramY = (containerHeight - diagramHeight * scale) / 2;
                 } else {
-                    // Height heavy
                     scale = (containerHeight - 2 * padding) / diagramHeight;
                     minScale = maxZoomOutSize / diagramHeight;
                     diagramX = (containerWidth - diagramWidth * scale) / 2;
                     diagramY = padding;
                 }
 
-                // Ensure we don't zoom out beyond the 2-inch limit
                 scale = Math.max(scale, minScale);
 
                 updateTransform();
@@ -112,9 +262,8 @@
         function handleWheel(e) {
             e.preventDefault();
             const delta = e.deltaY * -0.0035;
-            const newScale = Math.max(minScale, Math.min(10, scale + delta)); // Add upper limit of 10x zoom
+            const newScale = Math.max(minScale, Math.min(10, scale + delta));
 
-            // Adjust position to zoom towards cursor
             const rect = diagramContainer.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
@@ -126,6 +275,7 @@
         }
 
         function handleMouseDown(e) {
+            if (e.target.closest('#sidebar')) return;
             isDragging = true;
             startX = e.clientX - diagramX;
             startY = e.clientY - diagramY;
@@ -152,7 +302,6 @@
         diagramContainer.addEventListener('mouseup', handleMouseUp);
         diagramContainer.addEventListener('mouseleave', handleMouseUp);
 
-        // Refit diagram on window resize
         window.addEventListener('resize', fitDiagramToOptimalView);
     </script>
 </body>
