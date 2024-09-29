@@ -1,3 +1,4 @@
+import os
 import time
 
 # Wait for 5 seconds
@@ -85,11 +86,12 @@ node_info = """const nodeInfo = {
 };
 """
 
-# Create node info JavaScript object
-#node_info_js = "const nodeInfo = " + json.dumps(node_info).replace("'", '"') + ";"
+# Get the directory of the current script
+current_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Path to the index.html file
-html_file_path = 'C:\\Users\\Nick\\Desktop\\shellhacks_map\\roadmap.html'
+# Construct the path to the index.html file in the current directory
+html_file_path = os.path.join(current_dir, 'roadmap.html')
+
 
 # Read the existing HTML file and replace the placeholders
 with open(html_file_path, 'r') as file:
