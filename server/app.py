@@ -75,6 +75,70 @@ def roadmap():
     latest_flowchart = get_latest_flowchart()
     
     updated_content = template_content.replace("A[Loading...]", latest_flowchart[len('graph TD'):])
+    '''
+    new_content = new_content.replace("""{
+    A: {
+      title: "", 
+      content: ""
+    },
+    B: {
+      title: "", 
+      content: ""
+    },
+    C: {
+      title: "", 
+      content: ""
+    },
+    D: {
+      title: "", 
+      content: ""
+    },
+    E: {
+      title: "", 
+      content: ""
+    },
+    F: {
+      title: "", 
+      content: ""
+    },
+    G: {
+      title: "", 
+      content: ""
+    },
+    H: {
+      title: "", 
+      content: ""
+    },
+    I: {
+      title: "", 
+      content: ""
+    },
+    J: {
+      title: "", 
+      content: ""
+    },
+    K: {
+      title: "", 
+      content: ""
+    },
+    L: {
+      title: "", 
+      content: ""
+    },
+    M: {
+      title: "", 
+      content: ""
+    },
+    N: {
+      title: "", 
+      content: ""
+    },
+    O: {
+      title: "", 
+      content: ""
+    }
+  };""", node_info)
+    '''
     
     return render_template_string(updated_content)
 
