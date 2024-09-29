@@ -1,11 +1,11 @@
 import anthropic
 
-client = anthropic.Anthropic()
+anthropic_client = anthropic.Anthropic()
 
 PROMPT = (
-    "Create a flowchart/roadmap of vast depth using Mermaid syntax that best suits the following profile. "
-    "Make sure to include multi-step reasoning, feedback loops,and logic nodes if necessary. "
-    "Output only the Mermaid code, without any explanations or additional text. "
+    "Create a roadmap using Mermaid js that best suits the following profile be as specific as possible. "
+    "Do not put any nodes past node T."
+    "Output only the Mermaid js code that generates the graph (starting with graph TD and then the body of the roadmap ending with the last node as the final output no quotes or other markers at the end do not include any other text). "
     "Here is the profile: {profile}"
 )
 
@@ -14,7 +14,7 @@ def generate_flowchart(profile):
     print(prompt)
 
     try:
-        message = client.messages.create(
+        message = anthropic_client.messages.create(
             model="claude-3-5-sonnet-20240620",
             max_tokens=2000,
             temperature=0,

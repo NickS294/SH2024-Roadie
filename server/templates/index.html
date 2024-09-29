@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html data-bs-theme="dark">
+<head>
+    <title>Ask {{voice}}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .audio-player {
+            margin-top: 20px;
+            margin-bottom: 40px;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/typeit@8.7.1/dist/index.umd.js"></script>
+</head>
+<body>
+    <div class="container text-center mt-5">
+        <div class="row">
+            <div class="col-12 col-md-6 col-xl-4 mx-auto">
+                <img class="mb-3" src="/static/hugh.png" alt="" style="height:250px">
+                <h1 class="mb-4">Ask {{voice}}</h1>
+                <div class="form-group d-flex justify-content-between">
+                    <button type="button" class="btn btn-danger" style="width:48%" id="record-button">Record</button>
+                    <button type="button" class="btn btn-primary" style="width:48%" id="ask-button">Start Conversation</button>
+                </div>
+                <div class="audio-player">
+                    <audio id="audio-element"></audio>
+                </div>
+                <div class="response">
+                    <p id="response-text"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(() => {
+            // Get references to HTML elements
+            const askButton = $('#ask-button');
+            const audioElement = $('#audio-element')[0];
+            const conversation = [];
+
+            // Helper methods
+            const disableButton = (btn) => { btn.addClass("loading").prop("disabled", true); }
+            const enableButton = (btn) => { btn.removeClass("loading").prop("disabled", false); }
+
+            // Initialize TypeIt
+            new TypeIt("#response-text", {
+              strings: "How can I help?",
+              speed: 40,
+              waitUntilVisible: true,
+              cursorChar: "▊",
+            }).go();
+
+            // Initialize MediaRecorder
+            let chunks = [];
+            let recording = false;
+            let mediaRecorder;
+
+            navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.ondataavailable = (event) => {
+                    chunks.push(event.data);
+                };
+                mediaRecorder.onstop = () => {
+                    disableButton($('#record-button'));
+                    $('#record-button')[0].innerHTML = "Transcribing...";
+                    const audioData = new Blob(chunks, { type: 'audio/wav' });
+                    const formData = new FormData();
+                    formData.append('file', audioData, 'audio.wav');
+                    $.ajax({
+                        type: 'POST',
+                        url: '/transcribe',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: (data) => {
+                            conversation.push({ role: "user", "content": data.text });
+                            askForResponse(data.text); // Ask for response based on the transcribed text
+                        }
+                    });
+                };
+            });
+
+            // Start conversation when ask button is clicked
+            askButton.click(() => {
+                disableButton(askButton);
+                askButton[0].innerHTML = "Thinking...";
+                conversation.length = 0; // Clear conversation on new start
+                makeGreetingRequest(); // Request greeting
+            });
+
+            // Function to make a greeting request
+            const makeGreetingRequest = () => {
+                $.ajax({
+                    type: 'POST',
+                    url: '/greeting',
+                    success: (data) => {
+                        // Display greeting text
+                        $("#response-text")[0].innerHTML = data.text;
+                        // Play greeting audio
+                        audioElement.src = data.audio;
+                        audioElement.controls = true;
+                        audioElement.play();
+                        enableButton($('#record-button'));
+                        $('#record-button')[0].innerHTML = "Record"; // Reset record button text
+                    }
+                });
+            };
+
+            // Function to ask for a response based on user input
+            const askForResponse = (userInput) => {
+                const textData = { conversation: conversation };
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/ask',
+                    data: JSON.stringify(textData),
+                    contentType: 'application/json',
+                    success: (data) => {
+                        const fileURL = data.audio;
+                        conversation.push({ role: "assistant", "content": data.text });
+                        new TypeIt("#response-text", {
+                            strings: data.text,
+                            speed: 39,
+                            waitUntilVisible: false,
+                            cursorChar: "▊",
+                        }).go();
+                        audioElement.src = fileURL;
+                        audioElement.controls = true;
+                        audioElement.play();
+                        enableButton($('#record-button'));
+                        $('#record-button')[0].innerHTML = "Record";
+                    }
+                });
+            };
+
+            // Handle keydown and keyup events for Enter key
+            $(document).keydown((event) => {
+                if (event.key === "Enter" && !recording) {
+                    $('#record-button')[0].innerHTML = "Recording...";
+                    chunks = [];
+                    mediaRecorder.start();
+                    recording = true;
+                }
+            });
+
+            $(document).keyup((event) => {
+                if (event.key === "Enter" && recording) {
+                    mediaRecorder.stop();
+                    recording = false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

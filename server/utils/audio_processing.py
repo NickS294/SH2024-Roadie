@@ -1,38 +1,43 @@
-import speech_recognition as sr
-import numpy as np
-import pygame
+import asyncio
 import io
 from elevenlabs import VoiceSettings
-import time
-from .config import recognizer, whisper_model, elevenlabs_client, transcription_queue, speech_queue, is_speaking
-from .shared import ai_is_speaking
+from .config import elevenlabs_client, whisper_client, transcription_queue, speech_queue, is_speaking, audio_queue
+import json
 
-def listen_and_transcribe():
-    with sr.Microphone(sample_rate=16000) as source:
-        recognizer.adjust_for_ambient_noise(source, duration=1)
-        print("Listening...")
+async def listen_and_transcribe():
+    print("Listening...")
+    audio_data = io.BytesIO()
+    content_type = None
+    
+    while True:
+        data = await audio_queue.get()
+        if data is None:  # Signal to stop listening
+            break
+        if content_type is None:
+            content_type, chunk = data
+        else:
+            _, chunk = data
+        audio_data.write(chunk)
+    
+    audio_data.seek(0)
+    
+    try:
+        result = whisper_client.audio.transcriptions.create(
+            model="whisper-1", 
+            file=("audio_file", audio_data, content_type),
+            language="en"
+        )
         
-        while True:
-            if ai_is_speaking.is_set():
-                time.sleep(0.1)
-                continue
-            try:
-                audio = recognizer.listen(source, timeout=5, phrase_time_limit=10)
-                np_audio = np.frombuffer(audio.get_raw_data(), dtype=np.int16)
-                np_audio = np_audio.astype(np.float32) / np.iinfo(np.int16).max
-                
-                result = whisper_model.transcribe(np_audio, fp16=False, language='en')
-                text = result['text'].strip()
-                
-                if text:
-                    print(f"Transcribed: '{text}'")
-                    transcription_queue.put(text)
-            except sr.WaitTimeoutError:
-                pass
-            except Exception as e:
-                print(f"An error occurred in transcription: {e}")
+        text = result.text.strip()
+        
+        if text:
+            print(f"Transcribed: '{text}'")
+            await transcription_queue.put(text)
+    except Exception as e:
+        print(f"An error occurred in transcription: {e}")
+        await transcription_queue.put(None)
 
-def speak(text):
+async def speak(text):
     is_speaking.set()
     print(f"AI: {text}")
     try:
@@ -44,23 +49,29 @@ def speak(text):
                 stability=0.5,
                 similarity_boost=0.75,
                 style=0.8,
-            ),
+            )
         )
+        
         
         audio_data = b''.join(list(audio_stream))
         
-        audio_stream = io.BytesIO(audio_data)
-        pygame.mixer.music.load(audio_stream)
-        pygame.mixer.music.play()
-        while pygame.mixer.music.get_busy():
-            pygame.time.Clock().tick(10)
+        # Send the audio data to the client
+        await speech_queue.put(json.dumps({"type": "audio", "content": audio_data.decode('latin1')}))
     except Exception as e:
         print(f"Error in speech synthesis: {e}")
     finally:
         is_speaking.clear()
 
-def speech_worker():
+async def speech_worker():
     while True:
-        text = speech_queue.get()
-        speak(text)
+        message = await speech_queue.get()
+        message_data = json.loads(message)
+        if message_data['type'] == 'speech':
+            await speak(message_data['content'])
+        elif message_data['type'] == 'audio':
+            # This is already handled in the speak function
+            pass
+        elif message_data['type'] == 'end':
+            # Send the end message to the client
+            await speech_queue.put(message)
         speech_queue.task_done()
