@@ -76,7 +76,11 @@ def roadmap():
     
     updated_content = template_content.replace("A[Loading...]", latest_flowchart[len('graph TD'):])
     '''
-    new_content = new_content.replace("""{
+    updated_content = (
+    template_content
+    .replace("A[Loading...]", latest_flowchart[len('graph TD'):])
+    .replace(
+        """{
     A: {
       title: "", 
       content: ""
@@ -137,7 +141,9 @@ def roadmap():
       title: "", 
       content: ""
     }
-  };""", node_info)
+  };""", node_info
+    )
+)
     '''
     
     return render_template_string(updated_content)
