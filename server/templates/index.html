@@ -315,24 +315,21 @@
                     contentType: 'application/json',
                     success: (data) => {
                         const fileURL = data.audio;
-                        const end= data.end
+                        const end = data.end;
                         conversation.push({ role: "assistant", "content": data.text });
                         audioElement.src = fileURL;
                         audioElement.play();
                         enableButton(recordButton);
                         recordButton.text("Record");
-
+                        
                         if (end) {
                             const end_text = data.flowchart_text;
-                            $('#conversation-page').fadeOut(1000);
-                            $('#end-page').delay(1000).fadeIn(1000, () => {
-                                loadMermaidDiagram();
-                            });
-                            $(document).off('keydown keyup');
+                            // Redirect to the specified page
+                            window.location.href = '/home/aalmonte/workspace/SH2024-Prep/server/templates/roadmap.html';
                         } else {
                             enableButton(recordButton);
                             recordButton.text("Record");
-                        }
+                                    }
                     }
                 });
             };
