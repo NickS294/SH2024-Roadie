@@ -9,14 +9,12 @@ Flowchart:
 
 Provide your summary, speaking directly to the person:
 """
-
-async def narrate_flowchart(flowchart):
+def narrate_flowchart(flowchart):
     prompt = PROMPT.format(flowchart=flowchart)
     messages= [{"role": "system", "content": "You are a supportive career coach speaking directly to your client. You communicate in a warm, encouraging manner, translating complex career paths into clear, actionable insights."}
                ,{"role": "user", "content": prompt}]
     try:
-        narrative= await get_gpt_response(messages)
-        await speak(narrative)
+        narrative= get_gpt_response(messages)
         
         return narrative
 
