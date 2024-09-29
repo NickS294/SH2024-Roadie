@@ -1,7 +1,3 @@
-Sure! Here’s the revised README without the "feel free" part or any footer:
-
----
-
 # Roadie
 
 **Roadie** is a personalized guide designed to support minority students on their educational journey. By leveraging AI and mentorship, Roadie helps users navigate obstacles and unlock opportunities.
