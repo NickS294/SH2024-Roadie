@@ -3,6 +3,7 @@ import os
 import requests
 import uuid
 from flask import Flask, request, jsonify, send_file, render_template
+from flask import render_template_string
 from dotenv import load_dotenv
 import os
 
@@ -68,7 +69,19 @@ def index():
 
 @app.route('/roadmap')
 def roadmap():
-    return render_template('roadmap.html')
+    with open(os.path.join(os.path.dirname(__file__), "templates/roadmap.html"), 'r') as file:
+        template_content = file.read()
+    
+    latest_flowchart = get_latest_flowchart()
+    
+    updated_content = template_content.replace("A[Loading...]", latest_flowchart[len('graph TD'):])
+    
+    return render_template_string(updated_content)
+
+
+def get_latest_flowchart():
+    global latest_flowchart_data
+    return latest_flowchart_data
 
 
 @app.route('/transcribe', methods=['POST'])
@@ -116,13 +129,8 @@ def ask():
     generate_audio(reply, output_path=reply_path)
     if profile_created:
         
-        html_file_path = os.path.join(os.path.dirname(__file__), "templates/roadmap.html")
-        print(html_file_path)
-        with open(html_file_path, 'r') as file:
-            content = file.read()
-        new_content = content.replace("A[Loading...]", flow_chart[len('graph TD'):])
-        with open(html_file_path, 'w') as file:
-            file.write(new_content)
+        global latest_flowchart_data
+        latest_flowchart_data = flow_chart
         
     return jsonify({'text': reply, 'end': profile_created, 'flowchart_text': flow_chart, 'audio': f"/listen/{reply_file}"}) #see if this messes it up
 
