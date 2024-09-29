@@ -17,7 +17,6 @@ ELEVENLABS_VOICE_NAME = "Bella"
 from utils import update_profile_info, create_user_profile, get_next_profile_question, profile_info, whisper_client, elevenlabs_client, generate_flowchart
 from elevenlabs import VoiceSettings
 profile= None
-flow_chart= None
 ELEVENLABS_ALL_VOICES = []
 
 app = Flask(__name__)
@@ -37,9 +36,9 @@ def generate_reply(conversation: list) ->Tuple[str, bool] :
         if all(profile_info.values()):
             profile = create_user_profile(conversation)
             flow_chart= generate_flowchart(profile)
-            return ("Thank you for sharing. Based on what you've told me, here's a summary of your profile", True)
+            return ("Thank you for sharing. Based on what you've told me, here's a summary of your profile", True, flow_chart)
         
-    return (get_next_profile_question(conversation), False)
+    return (get_next_profile_question(conversation), False, None)
 
 def generate_audio(text: str, output_path: str = "") -> str:
     audio_stream = elevenlabs_client.text_to_speech.convert(
@@ -61,7 +60,13 @@ def generate_audio(text: str, output_path: str = "") -> str:
 @app.route('/')
 def index():
     """Render the index page."""
-    return render_template('index.html', voice=ELEVENLABS_VOICE_NAME)
+    return render_template('index.html')
+
+@app.route('/roadmap')
+def roadmap():
+    """Render content for the first section."""
+    return render_template('roadmap.html')
+
 
 @app.route('/transcribe', methods=['POST'])
 def transcribe():
@@ -90,7 +95,7 @@ def greeting():
 def ask():
     """Generate a ChatGPT response from the given conversation, then convert it to audio using ElevenLabs."""
     conversation = request.get_json(force=True).get("conversation", "")
-    reply, profile_created = generate_reply(conversation)
+    reply, profile_created, flow_chart = generate_reply(conversation)
     reply_file = f"{uuid.uuid4()}.mp3"
     reply_path = f"outputs/{reply_file}"
     os.makedirs(os.path.dirname(reply_path), exist_ok=True)
@@ -98,12 +103,15 @@ def ask():
     if profile_created:
         # Construct the path to the index.html file in the current directory
         html_file_path = "/home/aalmonte/workspace/SH2024-Prep/server/templates/roadmap.html"
-
         # Read the existing HTML file and replace the placeholders
         with open(html_file_path, 'r') as file:
-        content = file.read()
+            content = file.read()
         # Replace the diagram definition placeholder with the actual graph text
-        new_content = content.replace("A[Loading...]",    graph_text[len('graph TD'):])
+        new_content = content.replace("A[Loading...]", flow_chart[len('graph TD'):])
+        # Write the updated content back to the index.html file
+        with open(html_file_path, 'w') as file:
+            file.write(new_content)
+        
 
     return jsonify({'text': reply, 'end': profile_created, 'flowchart_text': flow_chart, 'audio': f"/listen/{reply_file}"}) #see if this messes it up
 
