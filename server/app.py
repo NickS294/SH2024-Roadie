@@ -36,7 +36,7 @@ def generate_reply(conversation: list) -> str:
         print("Updated profile info:", {k: v for k, v in profile_info.items() if v is not None})
         if all(profile_info.values()):
             profile = create_user_profile(conversation)
-            _= generate_flowchart(profile)
+            _=generate_flowchart(profile)
             
             return "Thank you for sharing. Based on what you've told me, here's a summary of your profile"
         

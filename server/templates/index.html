@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Roadie - AI Assistant</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
     <style>
         body, html {
             margin: 0;
@@ -22,19 +23,37 @@
             z-index: -1;
         }
         .content {
-            position: relative;
+            position: absolute;
+            right: 10%;
+            top: 50%;
+            transform: translateY(-50%);
             z-index: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
             color: white;
-            text-align: center;
+            text-align: right;
+            max-width: 40%;
+        }
+        .content1 {
+            position: absolute;
+            right: 10%;
+            top: 75%;
+            transform: translateY(-50%);
+            z-index: 1;
+            color: white;
+            text-align: right;
+            max-width: 40%;
         }
         h1 {
-            font-size: 2.5rem;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+        h1.purple-color {
+            color: #8A2BE2;
+        }
+        .description {
+            font-size: 1rem;
             margin-bottom: 2rem;
+            line-height: 1.5;
         }
         .start-button {
             padding: 0.75rem 2rem;
@@ -42,67 +61,104 @@
             color: white;
             background-color: transparent;
             border: 2px solid white;
-            border-radius: 9999px;
+            border-radius: 0;
             cursor: pointer;
             transition: all 0.3s ease;
         }
         .start-button:hover {
+            padding: 1rem 2.1rem;
             background-color: white;
+            font-size: 1.2rem;
             color: #4B0082;
+        }
+        #controls-container {
+            position: fixed;
+            bottom: 15%;
+            right: 15%;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            padding: 15px;
+            border-radius: 0;
+        }
+        #record-button {
+            width: auto;
+            margin-bottom: 10px;
+            border-radius: 0;
+        }
+        .audio-player {
+            margin-top: 10px;
+        }
+        audio {
+            max-width: 100%;
+            border-radius: 0;
+        }
+        audio::-webkit-media-controls-panel,
+        audio::-webkit-media-controls-enclosure {
+            border-radius: 0;
         }
     </style>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .audio-player {
-            margin-top: 20px;
-            margin-bottom: 40px;
-        }
-    </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://unpkg.com/typeit@8.7.1/dist/index.umd.js"></script>
 </head>
 <body>
     <div id="background"></div>
-    <div class="content">
-        <h1>Roadie</h1>
-        <button class="start-button" onclick="handleStart()">Start Journey</button>
+    <div class="content" id="home-page">
+        <h1 id="roadie-title">Roadie</h1>
+        <button class="start-button" id="start-journey-button">Start Journey</button>
     </div>
+    <div class="content1" id="home-page">
+        <p class="description" id="home-page1">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus.
+        </p>
+    </div> 
+    
+    <div id="conversation-page" style="display:none;">
+        <div id="controls-container">
+            <button type="button" class="btn btn-danger" id="record-button">Record</button>
+            <div class="audio-player">
+                <audio id="audio-element" controls></audio>
+            </div>
+        </div>
+    </div>
+
     <script>
-        function handleStart() {
-            console.log("Navigating to AI assistant...");
-            // Add your navigation logic here
-        }
-
-        // Three.js background setup
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('background').appendChild(renderer.domElement);
-
-        // Create wireframe sphere
-        const geometry = new THREE.SphereGeometry(5, 32, 32);
-        const material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: true });
-        const sphere = new THREE.Mesh(geometry, material);
-        scene.add(sphere);
-
-        // Create grid of points
-        const gridGeometry = new THREE.BufferGeometry();
-        const gridMaterial = new THREE.PointsMaterial({ color: 0xFFFFFF, size: 0.05 });
-        const gridPositions = [];
-        for (let i = 0; i < 1000; i++) {
-            const x = (Math.random() - 0.5) * 20;
-            const y = (Math.random() - 0.5) * 20;
-            const z = (Math.random() - 0.5) * 20;
-            gridPositions.push(x, y, z);
-        }
-        gridGeometry.setAttribute('position', new THREE.Float32BufferAttribute(gridPositions, 3));
-        const gridPoints = new THREE.Points(gridGeometry, gridMaterial);
-        scene.add(gridPoints);
-
-        camera.position.z = 10;
-
+        let scene, camera, renderer, sphere, gridPoints;
+        let targetPosition = { x: -5, y: 0, z: 0 };
         let mouseX = 0, mouseY = 0;
+
+        function initThree() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000000, 1);
+            document.getElementById('background').appendChild(renderer.domElement);
+
+            // Create wireframe sphere
+            const geometry = new THREE.SphereGeometry(5, 32, 32);
+            const material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: true });
+            sphere = new THREE.Mesh(geometry, material);
+            sphere.position.set(targetPosition.x, targetPosition.y, targetPosition.z);
+            scene.add(sphere);
+
+            // Create grid of points
+            const gridGeometry = new THREE.BufferGeometry();
+            const gridMaterial = new THREE.PointsMaterial({ color: 0xFFFFFF, size: 0.05 });
+            const gridPositions = [];
+            for (let i = 0; i < 1000; i++) {
+                const x = (Math.random() - 0.5) * 20;
+                const y = (Math.random() - 0.5) * 20;
+                const z = (Math.random() - 0.5) * 20;
+                gridPositions.push(x, y, z);
+            }
+            gridGeometry.setAttribute('position', new THREE.Float32BufferAttribute(gridPositions, 3));
+            gridPoints = new THREE.Points(gridGeometry, gridMaterial);
+            scene.add(gridPoints);
+
+            camera.position.z = 10;
+        }
 
         function animate() {
             requestAnimationFrame(animate);
@@ -110,11 +166,19 @@
             sphere.rotation.x += 0.005;
             sphere.rotation.y += 0.005;
 
-            camera.position.x += (mouseX - camera.position.x) * 0.05;
-            camera.position.y += (-mouseY - camera.position.y) * 0.05;
+            camera.position.x += (mouseX * 0.05 - camera.position.x) * 0.05;
+            camera.position.y += (-mouseY * 0.05 - camera.position.y) * 0.05;
             camera.lookAt(scene.position);
 
+            TWEEN.update();
+
             renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
         }
 
         function onMouseMove(event) {
@@ -122,65 +186,47 @@
             mouseY = (event.clientY - window.innerHeight / 2) / 100;
         }
 
-        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('resize', onWindowResize);
+        document.addEventListener('mousemove', onMouseMove, false);
 
-        animate();
+        function moveGlobeToCenter() {
+            new TWEEN.Tween(targetPosition)
+                .to({ x: 0, y: 0, z: 0 }, 2000)
+                .easing(TWEEN.Easing.Quadratic.Out)
+                .onUpdate(() => {
+                    sphere.position.set(targetPosition.x, targetPosition.y, targetPosition.z);
+                })
+                .start();
+        }
 
-        // Handle window resize
-        window.addEventListener('resize', function() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-    </script>
-    <div id="home-page" class="container text-center mt-5">
-        <div class="row">
-            <div class="col-12 col-md-6 col-xl-4 mx-auto">
-                <div class="form-group">
-                    <button type="button" class="btn btn-primary" style="width:100%" id="start-button">Start Conversation</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="conversation-page" class="container text-center mt-5" style="display:none;">
-        <div class="row">
-            <div class="col-12 col-md-6 col-xl-4 mx-auto">
-                <div class="form-group">
-                    <button type="button" class="btn btn-danger" style="width:100%" id="record-button">Record</button>
-                </div>
-                <div class="audio-player">
-                    <audio id="audio-element"></audio>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
         $(document).ready(() => {
-            // Get references to HTML elements
-            const startButton = $('#start-button');
+            initThree();
+            animate();
+
+            const startJourneyButton = $('#start-journey-button');
             const recordButton = $('#record-button');
             const audioElement = $('#audio-element')[0];
+            const roadieTitle = $('#roadie-title');
             const conversation = [];
 
-            // Helper methods
             const disableButton = (btn) => { btn.addClass("loading").prop("disabled", true); }
             const enableButton = (btn) => { btn.removeClass("loading").prop("disabled", false); }
 
-            // Initialize MediaRecorder
+            startJourneyButton.hover(
+                function() { roadieTitle.addClass('purple-color'); },
+                function() { roadieTitle.removeClass('purple-color'); }
+            );
+
             let chunks = [];
             let recording = false;
             let mediaRecorder;
 
             navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
                 mediaRecorder = new MediaRecorder(stream);
-                mediaRecorder.ondataavailable = (event) => {
-                    chunks.push(event.data);
-                };
+                mediaRecorder.ondataavailable = (event) => { chunks.push(event.data); };
                 mediaRecorder.onstop = () => {
                     disableButton(recordButton);
-                    recordButton[0].innerHTML = "Transcribing...";
+                    recordButton.text("Transcribing...");
                     const audioData = new Blob(chunks, { type: 'audio/wav' });
                     const formData = new FormData();
                     formData.append('file', audioData, 'audio.wav');
@@ -192,41 +238,41 @@
                         processData: false,
                         success: (data) => {
                             conversation.push({ role: "user", "content": data.text });
-                            askForResponse(data.text); // Ask for response based on the transcribed text
+                            askForResponse(data.text);
                         }
                     });
                 };
             });
 
-            // Start conversation when start button is clicked
-            startButton.click(() => {
-                disableButton(startButton);
-                startButton[0].innerHTML = "Starting...";
-                conversation.length = 0; // Clear conversation on new start
-                makeGreetingRequest(); // Request greeting
-                $('#home-page').hide();
-                $('#conversation-page').show();
+            startJourneyButton.click(() => {
+                disableButton(startJourneyButton);
+                startJourneyButton.text("Starting Journey...");
+                $('#home-page1').fadeOut(500);
+                moveGlobeToCenter();
+                
+                setTimeout(() => {
+                    $('#home-page').fadeOut(1000);
+                    $('#conversation-page').delay(1000).fadeIn(1000);
+                    conversation.length = 0;
+                    makeGreetingRequest();
+                }, 2000);
             });
 
-            // Function to make a greeting request
             const makeGreetingRequest = () => {
                 $.ajax({
                     type: 'POST',
                     url: '/greeting',
                     success: (data) => {
-                        // Play greeting audio
                         audioElement.src = data.audio;
-                        audioElement.controls = true;
                         audioElement.play();
                         enableButton(recordButton);
-                        recordButton[0].innerHTML = "Record"; // Reset record button text
+                        recordButton.text("Record");
                     }
                 });
             };
 
             const askForResponse = (userInput) => {
                 const textData = { conversation: conversation };
-
                 $.ajax({
                     type: 'POST',
                     url: '/ask',
@@ -236,17 +282,16 @@
                         const fileURL = data.audio;
                         conversation.push({ role: "assistant", "content": data.text });
                         audioElement.src = fileURL;
-                        audioElement.controls = true;
                         audioElement.play();
                         enableButton(recordButton);
-                        recordButton[0].innerHTML = "Record";
+                        recordButton.text("Record");
                     }
                 });
             };
 
             $(document).keydown((event) => {
                 if (event.key === "Enter" && !recording) {
-                    recordButton[0].innerHTML = "Recording...";
+                    recordButton.text("Recording...");
                     chunks = [];
                     mediaRecorder.start();
                     recording = true;

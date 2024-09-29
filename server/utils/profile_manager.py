@@ -86,7 +86,7 @@ def get_next_profile_question(conversation_history):
     if unanswered_questions:
         next_question = unanswered_questions[0]
         prompt_message = [
-            {"role": "system", "content": "You are an AI assistant tasked with asking a specific question in a natural, conversational way. Consider the conversation history and formulate the question to flow naturally. Avoid repeating questions that have already been answered or addressed in the conversation."},
+            {"role": "system", "content": "You are an very friendly AI assistant tasked with asking a specific question in a natural, conversational way. Consider the conversation history and formulate the question to flow naturally. Avoid repeating questions that have already been answered or addressed in the conversation."},
             {"role": "user", "content": f"Conversation history: {json.dumps(conversation_history)}\nQuestion to ask about: {next_question}"}
         ]
         return get_gpt_response(prompt_message)
