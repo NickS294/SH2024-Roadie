@@ -1,45 +1,74 @@
 ```mermaid
 graph TD
     A[Abiel's Journey to Becoming a Doctor] --> B[Develop Interest in Medicine]
-    B --> C[Explore Neuroscience]
-    C --> D{Is Neuroscience the Right Path?}
-    D -->|Yes| E[Deepen Knowledge in Neuroscience]
-    D -->|No| F[Explore Other Medical Fields]
-    E --> G[Gain Practical Experience]
-    F --> G
-    G --> H{Sufficient Experience?}
-    H -->|No| G
-    H -->|Yes| I[Prepare for Medical School]
-    I --> J[Take Prerequisite Courses]
-    J --> K[Study for MCAT]
-    K --> L{MCAT Score Satisfactory?}
-    L -->|No| M[Retake MCAT]
-    M --> K
-    L -->|Yes| N[Apply to Medical Schools]
-    N --> O{Accepted to Medical School?}
-    O -->|No| P[Improve Application]
-    P --> N
-    O -->|Yes| Q[Begin Medical School]
-    Q --> R[Complete Pre-Clinical Years]
-    R --> S[Begin Clinical Rotations]
-    S --> T{Choose Specialty?}
-    T -->|Neurology| U[Focus on Neurology]
-    T -->|Other| V[Explore Other Specialties]
-    U --> W[Complete Residency]
-    V --> W
-    W --> X[Obtain Medical License]
-    X --> Y[Start Medical Practice]
-    Y --> Z{Continuous Learning and Improvement}
-    Z --> AA[Attend Conferences]
-    Z --> AB[Pursue Research Opportunities]
-    Z --> AC[Mentor New Medical Students]
-    AA --> Z
-    AB --> Z
-    AC --> Z
-    Z --> AD[Make a Positive Impact on Patients' Lives]
-    AD --> AE{Career Satisfaction?}
-    AE -->|Yes| AF[Continue Current Path]
-    AE -->|No| AG[Reassess Career Goals]
-    AG --> A
-    AF --> Z
+    B --> C{Is passion genuine?}
+    C -->|Yes| D[Set Clear Career Goal]
+    C -->|No| E[Explore Other Career Options]
+    D --> F[Research Medical School Requirements]
+    F --> G[Plan Academic Path]
+    G --> H[Excel in High School]
+    H --> I[Participate in Extracurricular Activities]
+    I --> J[Volunteer in Healthcare Settings]
+    J --> K[Gain Practical Experience]
+    K --> L[Shadow Doctors]
+    L --> M[Reflect on Experiences]
+    M -->|Reinforces Passion| N[Prepare for College]
+    M -->|Doubts Arise| O[Reassess Career Choice]
+    O -->|Decide to Continue| N
+    O -->|Choose Different Path| P[Explore Alternative Careers]
+    N --> Q[Choose Pre-med Major]
+    Q --> R[Excel in Undergraduate Studies]
+    R --> S[Build Strong GPA]
+    S --> T[Prepare for MCAT]
+    T --> U[Take MCAT]
+    U -->|Satisfactory Score| V[Apply to Medical Schools]
+    U -->|Unsatisfactory Score| W[Retake MCAT]
+    W --> U
+    V --> X[Interview Process]
+    X -->|Accepted| Y[Enter Medical School]
+    X -->|Rejected| Z[Reapply or Consider Alternatives]
+    Z -->|Reapply| V
+    Z -->|Consider Alternatives| AA[Explore Related Healthcare Careers]
+    Y --> AB[Complete Medical School Curriculum]
+    AB --> AC[Clinical Rotations]
+    AC --> AD[Choose Specialty]
+    AD --> AE[Apply for Residency]
+    AE --> AF[Complete Residency]
+    AF --> AG[Optional: Fellowship]
+    AG --> AH[Obtain Medical License]
+    AH --> AI[Start Medical Practice]
+    AI --> AJ[Continuous Professional Development]
+    AJ --> AK[Engage in Community Service]
+    AK --> AL[Mentor Aspiring Doctors]
+    AL --> AM[Contribute to Medical Research]
+    AM --> AN[Advance in Career]
+    AN --> AO[Consider Specialization or Leadership Roles]
+    AO --> AP[Reflect on Career and Impact]
+    AP -->|Satisfied| AQ[Continue Serving Community]
+    AP -->|Seek New Challenges| AR[Explore New Areas in Medicine]
+    AR --> AS[Adapt and Grow in Career]
+    AS --> AT[Leave Lasting Impact on Healthcare]
+
+    %% Feedback Loops
+    AJ -.-> AI
+    AK -.-> AI
+    AL -.-> AK
+    AM -.-> AN
+
+    %% Resource and Mentorship Nodes
+    B1[Seek Mentorship] -.-> B
+    F1[Research Scholarship Opportunities] -.-> F
+    H1[Join Science Clubs] -.-> H
+    J1[Network with Healthcare Professionals] -.-> J
+    N1[Seek Financial Aid and Scholarships] -.-> N
+    R1[Join Pre-med Study Groups] -.-> R
+    T1[Enroll in MCAT Prep Courses] -.-> T
+    Y1[Secure Student Loans/Scholarships] -.-> Y
+    AB1[Join Medical Student Associations] -.-> AB
+    AF1[Seek Guidance from Senior Residents] -.-> AF
+    AI1[Join Professional Medical Associations] -.-> AI
+    AJ1[Attend Medical Conferences] -.-> AJ
+    AL1[Participate in Medical Outreach Programs] -.-> AL
+    AM1[Collaborate with Research Institutions] -.-> AM
+    AN1[Seek Leadership Training] -.-> AN
 ```

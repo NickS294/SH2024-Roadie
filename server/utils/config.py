@@ -1,31 +1,34 @@
 import os
-from dotenv import load_dotenv
-import speech_recognition as sr
-import whisper
 import openai
-from elevenlabs import ElevenLabs
-import queue
-import threading
+import elevenlabs
+import asyncio
 import pygame
 import anthropic
 
+from dotenv import load_dotenv
 load_dotenv()
 
-client = openai.OpenAI(api_key=os.environ['OPENAI_API_KEY'])
-anthropic_client = anthropic.Anthropic()
-elevenlabs_client = ElevenLabs(api_key=os.environ['ELEVENLABS_API_KEY'])
-
-whisper_model = whisper.load_model("medium")
-
-recognizer = sr.Recognizer()
-recognizer.energy_threshold = 1800
-recognizer.dynamic_energy_threshold = True
+client = openai.AsyncOpenAI(api_key=os.environ['OPENAI_API_KEY'])
+whisper_client = openai.AsyncOpenAI(api_key=os.environ['OPENAI_API_KEY'])
+anthropic_client = anthropic.AsyncAnthropic(api_key=os.environ['ANTHROPIC_API_KEY'])
+elevenlabs_client =elevenlabs.ElevenLabs(api_key=os.environ['ELEVENLABS_API_KEY'])
 
 pygame.mixer.init()
 
-transcription_queue = queue.Queue()
-speech_queue = queue.Queue()
+# Queues and Events
+transcription_queue = asyncio.Queue()
+speech_queue = asyncio.Queue()
+audio_queue = asyncio.Queue()
 
+# Events
+is_speaking = asyncio.Event()
+transcription_result = asyncio.Event()
+
+# Profile information
 profile_info = {q: None for q in ["name", "goals", "interests", "challenge"]}
 
-is_speaking = threading.Event()
+# Global variables for conversation state
+conversation_task = None
+speech_task = None
+profile_result = None
+flowchart_result = None
