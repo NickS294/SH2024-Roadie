@@ -139,7 +139,7 @@
     </div>
     <div class="content1" id="home-page">
         <p class="description" id="home-page1">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus.
+            A roadmap with your opportunities. Roadie wants to get to know you and understand your aspirations. Through conversation, it learns about your dreams, passions, and personal challenges, offering a personalized roadmap to help you tackle obstacles and achieve your goals.
         </p>
     </div> 
     
@@ -306,6 +306,18 @@
                 });
             };
 
+            const makeNarrationRequest = (end_text) => {
+                $.ajax({
+                    type: 'POST',
+                    url: '/narrate',
+                    data: JSON.stringify({ flowchart_text: end_text }),
+                    contentType: 'application/json',
+                    success: (data) => {
+                        sessionStorage.setItem('narrationAudio', data.audio);
+                        window.location.href = '/roadmap';
+                    }
+                });
+            };
             const askForResponse = (userInput) => {
                 const textData = { conversation: conversation };
                 $.ajax({
@@ -322,49 +334,26 @@
                         enableButton(recordButton);
                         recordButton.text("Record");
                         
+                        audioElement.onended = () => {
                         if (end) {
                             const end_text = data.flowchart_text;
-                            // Redirect to the specified page
-                            window.location.href = '/roadmap';
+                            makeNarrationRequest(end_text);
                         } else {
                             enableButton(recordButton);
                             recordButton.text("Record");
                         }
+                    };
+
+                    audioElement.play();
+                    
+                    if (!end) {
+                        enableButton(recordButton);
+                        recordButton.text("Record");
+                    }
                     }
                 });
             };
 
-            function loadMermaidDiagram() {
-                $.ajax({
-                    url: '/get-mermaid-content',
-                    dataType: 'json',
-                    success: function(response) {
-                        const mmdContent = response.mermaidContent;
-                        mermaid.initialize({ startOnLoad: true });
-                        const element = document.querySelector("#mermaid-diagram");
-                        mermaid.render("mermaid-svg", mmdContent).then(({ svg }) => {
-                            element.innerHTML = svg;
-                            
-                            // Initialize panzoom
-                            const panzoomInstance = panzoom(element.querySelector('svg'), {
-                                maxZoom: 5,
-                                minZoom: 0.5,
-                                bounds: true,
-                                boundsPadding: 0.1
-                            });
-
-                            // Reset zoom on double-click
-                            element.addEventListener('dblclick', function(e) {
-                                panzoomInstance.zoomAbs(0, 0, 1);
-                                panzoomInstance.moveTo(0, 0);
-                            });
-                        });
-                    },
-                    error: function() {
-                        console.error('Failed to load Mermaid diagram');
-                    }
-                });
-            }
 
             $(document).keydown((event) => {
                 if (event.key === "Enter" && !recording) {

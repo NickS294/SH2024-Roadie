@@ -14,9 +14,8 @@ ELEVENLABS_VOICE_STABILITY = 0.5
 ELEVENLABS_VOICE_SIMILARITY = 0.75
 ELEVENLABS_VOICE_NAME = "Bella" 
 
-from utils import update_profile_info, create_user_profile, get_next_profile_question, profile_info, whisper_client, elevenlabs_client, generate_flowchart
+from utils import update_profile_info, create_user_profile, get_next_profile_question, profile_info, whisper_client, elevenlabs_client, generate_flowchart, narrate_flowchart
 from elevenlabs import VoiceSettings
-profile= None
 ELEVENLABS_ALL_VOICES = []
 
 app = Flask(__name__)
@@ -36,6 +35,11 @@ def generate_reply(conversation: list) ->Tuple[str, bool] :
         if all(profile_info.values()):
             profile = create_user_profile(conversation)
             flow_chart= generate_flowchart(profile)
+            
+            if flow_chart[0] == '`':
+                flow_chart= flow_chart[:-3]
+                flow_chart= flow_chart[len(str(r"```mermaid"))+1:]
+            
             return ("Thank you for sharing. Based on what you've told me, here's a summary of your profile", True, flow_chart)
         
     return (get_next_profile_question(conversation), False, None)
@@ -64,7 +68,6 @@ def index():
 
 @app.route('/roadmap')
 def roadmap():
-    """Render content for the first section."""
     return render_template('roadmap.html')
 
 
@@ -81,6 +84,17 @@ def transcribe():
     transcription = transcribe_audio(recording_path)
     return jsonify({'text': transcription})
 
+@app.route('/narrate', methods=['POST'])
+def narrate():
+    data = request.json
+    flow_chart = data.get('flowchart_text')
+    narration = narrate_flowchart(flow_chart)
+    narration_file = f"{uuid.uuid4()}.mp3"
+    narration_path = f"outputs/{narration_file}"
+    os.makedirs(os.path.dirname(narration_path), exist_ok=True)
+    generate_audio(narration, output_path=narration_path)
+    return jsonify({'text': narration, 'audio': f"/listen/{narration_file}"})
+    
 @app.route('/greeting', methods=['POST'])
 def greeting():
     """Greet user"""
@@ -101,14 +115,15 @@ def ask():
     os.makedirs(os.path.dirname(reply_path), exist_ok=True)
     generate_audio(reply, output_path=reply_path)
     if profile_created:
-        html_file_path = "/home/aalmonte/workspace/SH2024-Prep/server/templates/roadmap.html"
+        
+        html_file_path = os.path.join(os.path.dirname(__file__), "templates/roadmap.html")
+        print(html_file_path)
         with open(html_file_path, 'r') as file:
             content = file.read()
         new_content = content.replace("A[Loading...]", flow_chart[len('graph TD'):])
         with open(html_file_path, 'w') as file:
             file.write(new_content)
         
-
     return jsonify({'text': reply, 'end': profile_created, 'flowchart_text': flow_chart, 'audio': f"/listen/{reply_file}"}) #see if this messes it up
 
 @app.route('/listen/<filename>')
