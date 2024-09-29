@@ -1,6 +1,5 @@
 # Roadie
-![My Image]("C:\Users\Nick\Downloads\roadie_logo_1.jpg")
-
+![My Image](C:/Users/Nick/Downloads/roadie_logo_1.jpg)
 
 **Roadie** is a personalized guide designed to support minority students on their educational journey. By leveraging AI and mentorship, Roadie helps users navigate obstacles and unlock opportunities.
 
