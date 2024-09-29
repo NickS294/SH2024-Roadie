@@ -323,6 +323,7 @@
                         recordButton.text("Record");
 
                         if (end) {
+                            const end_text = data.flowchart_text;
                             $('#conversation-page').fadeOut(1000);
                             $('#end-page').delay(1000).fadeIn(1000, () => {
                                 loadMermaidDiagram();

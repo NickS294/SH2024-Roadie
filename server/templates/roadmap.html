@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Mermaid Diagram with Markdown Sidebar</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/9.3.0/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.2/marked.min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        #diagram-container {
+            width: 100%;
+            height: 100%;
+            background-color: #f0f0f0;
+            position: relative;
+            overflow: hidden;
+        }
+        #diagram {
+            position: absolute;
+            transform-origin: 0 0;
+        }
+        #header {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 5px 10px;
+            border-radius: 5px;
+            z-index: 1000;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        #sidebar {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background-color: white;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+            transition: right 0.3s ease;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            z-index: 1001;
+        }
+        #sidebar.open {
+            right: 0;
+        }
+        #sidebar-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+        #sidebar-content {
+            line-height: 1.6;
+        }
+        #sidebar-content h1, #sidebar-content h2, #sidebar-content h3 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        #sidebar-content ul, #sidebar-content ol {
+            padding-left: 20px;
+        }
+        #sidebar-content code {
+            background-color: #f0f0f0;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">Your Roadmap</div>
+    <div id="diagram-container">
+        <div id="diagram"></div>
+    </div>
+    <div id="sidebar">
+        <span id="sidebar-close">&times;</span>
+        <h2 id="sidebar-title"></h2>
+        <div id="sidebar-content"></div>
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: false });
+
+        const diagramContainer = document.getElementById('diagram-container');
+        const diagram = document.getElementById('diagram');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarTitle = document.getElementById('sidebar-title');
+        const sidebarContent = document.getElementById('sidebar-content');
+        const sidebarClose = document.getElementById('sidebar-close');
+        let isDragging = false;
+        let startX, startY, diagramX = 0, diagramY = 0;
+        let scale = 1;
+        let minScale = 1;
+
+        const diagramDefinition = `
+            graph TD
+            A[Loading...]
+    
+
+                `;
+
+                const nodeInfo = {
+    A: {
+      title: "", 
+      content: ""
+    },
+    B: {
+      title: "", 
+      content: ""
+    },
+    C: {
+      title: "", 
+      content: ""
+    },
+    D: {
+      title: "", 
+      content: ""
+    },
+    E: {
+      title: "", 
+      content: ""
+    },
+    F: {
+      title: "", 
+      content: ""
+    },
+    G: {
+      title: "", 
+      content: ""
+    },
+    H: {
+      title: "", 
+      content: ""
+    },
+    I: {
+      title: "", 
+      content: ""
+    },
+    J: {
+      title: "", 
+      content: ""
+    },
+    K: {
+      title: "", 
+      content: ""
+    },
+    L: {
+      title: "", 
+      content: ""
+    },
+    M: {
+      title: "", 
+      content: ""
+    },
+    N: {
+      title: "", 
+      content: ""
+    },
+    O: {
+      title: "", 
+      content: ""
+    }
+  };
+
+        mermaid.mermaidAPI.render('mermaid-diagram', diagramDefinition, (svgCode) => {
+            diagram.innerHTML = svgCode;
+            const svgElement = diagram.querySelector('svg');
+            svgElement.style.width = '100%';
+            svgElement.style.height = '100%';
+            
+            // Add click events to nodes
+            const nodes = svgElement.querySelectorAll('.node');
+            nodes.forEach(node => {
+                node.style.cursor = 'pointer';
+                node.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const nodeId = node.id.split('-')[1];
+                    openSidebar(nodeId);
+                });
+            });
+
+            fitDiagramToOptimalView();
+        });
+
+        function openSidebar(nodeId) {
+            const info = nodeInfo[nodeId];
+            if (info) {
+                sidebarTitle.textContent = info.title;
+                sidebarContent.innerHTML = marked.parse(info.content);
+                sidebar.classList.add('open');
+            }
+        }
+
+        sidebarClose.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+        });
+
+        function fitDiagramToOptimalView() {
+            const svgElement = diagram.querySelector('svg');
+            if (svgElement) {
+                const containerWidth = diagramContainer.clientWidth;
+                const containerHeight = diagramContainer.clientHeight;
+                const diagramWidth = svgElement.getBoundingClientRect().width;
+                const diagramHeight = svgElement.getBoundingClientRect().height;
+
+                const padding = 0.5 * 96;
+                const maxZoomOutSize = 7.5 * 96;
+
+                const aspectRatio = diagramWidth / diagramHeight;
+                const containerAspectRatio = containerWidth / containerHeight;
+
+                if (aspectRatio > containerAspectRatio) {
+                    scale = (containerWidth - 2 * padding) / diagramWidth;
+                    minScale = maxZoomOutSize / diagramWidth;
+                    diagramX = padding;
+                    diagramY = (containerHeight - diagramHeight * scale) / 2;
+                } else {
+                    scale = (containerHeight - 2 * padding) / diagramHeight;
+                    minScale = maxZoomOutSize / diagramHeight;
+                    diagramX = (containerWidth - diagramWidth * scale) / 2;
+                    diagramY = padding;
+                }
+
+                scale = Math.max(scale, minScale);
+
+                updateTransform();
+            }
+        }
+
+        function handleWheel(e) {
+            e.preventDefault();
+            const delta = e.deltaY * -0.0035;
+            const newScale = Math.max(minScale, Math.min(10, scale + delta));
+
+            const rect = diagramContainer.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            diagramX = x - (x - diagramX) * newScale / scale;
+            diagramY = y - (y - diagramY) * newScale / scale;
+            
+            scale = newScale;
+            updateTransform();
+        }
+
+        function handleMouseDown(e) {
+            if (e.target.closest('#sidebar')) return;
+            isDragging = true;
+            startX = e.clientX - diagramX;
+            startY = e.clientY - diagramY;
+        }
+
+        function handleMouseMove(e) {
+            if (!isDragging) return;
+            diagramX = (e.clientX - startX);
+            diagramY = (e.clientY - startY);
+            updateTransform();
+        }
+
+        function handleMouseUp() {
+            isDragging = false;
+        }
+
+        function updateTransform() {
+            diagram.style.transform = `translate(${diagramX}px, ${diagramY}px) scale(${scale})`;
+        }
+
+        diagramContainer.addEventListener('wheel', handleWheel);
+        diagramContainer.addEventListener('mousedown', handleMouseDown);
+        diagramContainer.addEventListener('mousemove', handleMouseMove);
+        diagramContainer.addEventListener('mouseup', handleMouseUp);
+        diagramContainer.addEventListener('mouseleave', handleMouseUp);
+
+        window.addEventListener('resize', fitDiagramToOptimalView);
+    </script>
+</body>
+</html>

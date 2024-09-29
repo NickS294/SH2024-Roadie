@@ -30,17 +30,16 @@ def transcribe_audio(filename: str) -> str:
             language="en"
         )
     return transcript.text.strip()
-
-def generate_reply(conversation: list) -> str:
+from typing import Tuple
+def generate_reply(conversation: list) ->Tuple[str, bool] :
     if update_profile_info(conversation[-1], conversation[:-1]):
         print("Updated profile info:", {k: v for k, v in profile_info.items() if v is not None})
         if all(profile_info.values()):
             profile = create_user_profile(conversation)
-            _=generate_flowchart(profile)
-            
-            return "Thank you for sharing. Based on what you've told me, here's a summary of your profile"
+            flow_chart= generate_flowchart(profile)
+            return ("Thank you for sharing. Based on what you've told me, here's a summary of your profile", True)
         
-    return get_next_profile_question(conversation)
+    return (get_next_profile_question(conversation), False)
 
 def generate_audio(text: str, output_path: str = "") -> str:
     audio_stream = elevenlabs_client.text_to_speech.convert(
@@ -91,13 +90,12 @@ def greeting():
 def ask():
     """Generate a ChatGPT response from the given conversation, then convert it to audio using ElevenLabs."""
     conversation = request.get_json(force=True).get("conversation", "")
-    reply = generate_reply(conversation)
+    reply, profile_created = generate_reply(conversation)
     reply_file = f"{uuid.uuid4()}.mp3"
     reply_path = f"outputs/{reply_file}"
     os.makedirs(os.path.dirname(reply_path), exist_ok=True)
-    print(reply)
     generate_audio(reply, output_path=reply_path)
-    return jsonify({'text': reply, 'audio': f"/listen/{reply_file}"})
+    return jsonify({'text': reply, 'end': profile_created, 'flowchart_text': flow_chart, 'audio': f"/listen/{reply_file}"})
 
 @app.route('/listen/<filename>')
 def listen(filename):
