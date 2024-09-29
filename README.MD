@@ -1,5 +1,5 @@
 # Roadie
-![My Image](https://github.com/NickS294/SH2024-Roadie/blob/main/roadie_logo_1.jpg)
+![My Image](https://github.com/NickS294/SH2024-Roadie/blob/main/roadie_logo_2.jpg)
 
 **Roadie** is a personalized guide designed to support minority students on their educational journey. By leveraging AI and mentorship, Roadie helps users navigate obstacles and unlock opportunities.
 
