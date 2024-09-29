@@ -107,11 +107,7 @@ def ask():
         with open(html_file_path, 'r') as file:
             content = file.read()
         # Replace the diagram definition placeholder with the actual graph text
-        new_content = content.replace("A[Loading...]", flow_chart[len('graph TD'):])
-        # Write the updated content back to the index.html file
-        with open(html_file_path, 'w') as file:
-            file.write(new_content)
-        
+        new_content = content.replace("A[Loading...]",    graph_text[len('graph TD'):])
 
     return jsonify({'text': reply, 'end': profile_created, 'flowchart_text': flow_chart, 'audio': f"/listen/{reply_file}"}) #see if this messes it up
 
