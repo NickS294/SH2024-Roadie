@@ -2,7 +2,7 @@ import json
 from .config import client, profile_info
 from .gpt_interface import get_gpt_response
 
-async def update_profile_info(user_input, conversation_history):
+def update_profile_info(user_input, conversation_history):
     function_description = {
         "name": "update_user_profile",
         "description": "Update user profile information based on their response",
@@ -51,7 +51,7 @@ async def update_profile_info(user_input, conversation_history):
     ]
 
     try:
-        response = await client.chat.completions.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=messages,
             functions=[function_description],
@@ -74,14 +74,14 @@ async def update_profile_info(user_input, conversation_history):
     
     return False
 
-async def create_user_profile(conversation_history):
+def create_user_profile(conversation_history):
     profile_message = [
         {"role": "system", "content": "You are an AI assistant tasked with creating a comprehensive user profile based on the following information and conversation history. Create a detailed and engaging summary of the user, and keep in mind that the user is from an underrepresented community however don't explicitly state this."},
         {"role": "user", "content": f"User information:\n" + "\n".join([f"{q}: {a}" for q, a in profile_info.items()]) + f"\n\nConversation history: {json.dumps(conversation_history)}"}
     ]
-    return await get_gpt_response(profile_message)
+    return get_gpt_response(profile_message)
 
-async def get_next_profile_question(conversation_history):
+def get_next_profile_question(conversation_history):
     unanswered_questions = [q for q, a in profile_info.items() if a is None]
     if unanswered_questions:
         next_question = unanswered_questions[0]
@@ -89,5 +89,5 @@ async def get_next_profile_question(conversation_history):
             {"role": "system", "content": "You are an AI assistant tasked with asking a specific question in a natural, conversational way. Consider the conversation history and formulate the question to flow naturally. Avoid repeating questions that have already been answered or addressed in the conversation."},
             {"role": "user", "content": f"Conversation history: {json.dumps(conversation_history)}\nQuestion to ask about: {next_question}"}
         ]
-        return await get_gpt_response(prompt_message)
+        return get_gpt_response(prompt_message)
     return None

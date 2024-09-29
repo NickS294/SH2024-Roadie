@@ -4,7 +4,7 @@ anthropic_client = anthropic.Anthropic()
 
 PROMPT = (
     "Create a flowchart/roadmap of vast depth using Mermaid syntax that best suits the following profile be as specific as possible. "
-    "Make sure to include multi-step reasoning, feedback loops,and logic nodes if necessary. "
+    "Make sure to include multi-step reasoning, feedback loops,and logic nodes if necessary. Do not put any nodes past node T."
     "Output only the Mermaid code, without any explanations or additional text. "
     "Here is the profile: {profile}"
 )

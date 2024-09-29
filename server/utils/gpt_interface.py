@@ -1,8 +1,8 @@
 from .config import client
 
-async def get_gpt_response(messages):
+def get_gpt_response(messages):
     try:
-        response = await client.chat.completions.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=messages,
             max_tokens=512

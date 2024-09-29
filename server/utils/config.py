@@ -8,9 +8,9 @@ import anthropic
 from dotenv import load_dotenv
 load_dotenv()
 
-client = openai.AsyncOpenAI(api_key=os.environ['OPENAI_API_KEY'])
-whisper_client = openai.AsyncOpenAI(api_key=os.environ['OPENAI_API_KEY'])
-anthropic_client = anthropic.AsyncAnthropic(api_key=os.environ['ANTHROPIC_API_KEY'])
+client = openai.OpenAI(api_key=os.environ['OPENAI_API_KEY'])
+whisper_client = openai.OpenAI(api_key=os.environ['OPENAI_API_KEY'])
+anthropic_client = anthropic.Anthropic(api_key=os.environ['ANTHROPIC_API_KEY'])
 elevenlabs_client =elevenlabs.ElevenLabs(api_key=os.environ['ELEVENLABS_API_KEY'])
 
 pygame.mixer.init()

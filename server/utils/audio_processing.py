@@ -22,7 +22,7 @@ async def listen_and_transcribe():
     audio_data.seek(0)
     
     try:
-        result = await whisper_client.audio.transcriptions.create(
+        result = whisper_client.audio.transcriptions.create(
             model="whisper-1", 
             file=("audio_file", audio_data, content_type),
             language="en"
@@ -41,8 +41,7 @@ async def speak(text):
     is_speaking.set()
     print(f"AI: {text}")
     try:
-        audio_stream = await asyncio.to_thread(
-            elevenlabs_client.text_to_speech.convert,
+        audio_stream = elevenlabs_client.text_to_speech.convert(
             voice_id="VBFC8kJbxuX1jslJGh3q", #Paola Voice
             model_id="eleven_turbo_v2",
             text=text,
@@ -52,6 +51,7 @@ async def speak(text):
                 style=0.8,
             )
         )
+        
         
         audio_data = b''.join(list(audio_stream))
         
