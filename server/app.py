@@ -98,13 +98,15 @@ def ask():
     if profile_created:
         # Construct the path to the index.html file in the current directory
         html_file_path = "/home/aalmonte/workspace/SH2024-Prep/server/templates/roadmap.html"
-
         # Read the existing HTML file and replace the placeholders
         with open(html_file_path, 'r') as file:
         content = file.read()
         # Replace the diagram definition placeholder with the actual graph text
-        new_content = content.replace("A[Loading...]",    graph_text[len('graph TD'):])
-
+        new_content = content.replace("A[Loading...]",    flowchart_text[len('graph TD'):])
+        # Write the updated content back to the index.html file
+        with open(html_file_path, 'w') as file:
+        file.write(new_content)
+        
     return jsonify({'text': reply, 'end': profile_created, 'flowchart_text': flow_chart, 'audio': f"/listen/{reply_file}"}) #see if this messes it up
 
 @app.route('/listen/<filename>')
